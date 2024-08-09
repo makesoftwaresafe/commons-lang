@@ -74,7 +74,6 @@ public class RandomUtils {
      * Gets the singleton instance based on {@link ThreadLocalRandom#current()}; <b>which is not cryptographically
      * secure</b>; use {@link #secure()} to use an algorithms/providers specified in the
      * {@code securerandom.strongAlgorithms} {@link Security} property.
-     * </p>
      * <p>
      * The method {@link ThreadLocalRandom#current()} is called on-demand.
      * </p>
@@ -82,9 +81,9 @@ public class RandomUtils {
      * @return the singleton instance based on {@link ThreadLocalRandom#current()}.
      * @see ThreadLocalRandom#current()
      * @see #secure()
-     * @since 3.16.0
+     * @since 3.17.0
      */
-    static RandomUtils insecure() {
+    public static RandomUtils insecure() {
         return INSECURE;
     }
 
@@ -93,7 +92,9 @@ public class RandomUtils {
      *
      * @return the random boolean
      * @since 3.5
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     public static boolean nextBoolean() {
         return secure().randomBoolean();
     }
@@ -104,7 +105,9 @@ public class RandomUtils {
      * @param count the size of the returned array
      * @return the random byte array
      * @throws IllegalArgumentException if {@code count} is negative
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     public static byte[] nextBytes(final int count) {
         return secure().randomBytes(count);
     }
@@ -115,7 +118,9 @@ public class RandomUtils {
      * @return the random double
      * @see #nextDouble(double, double)
      * @since 3.5
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     public static double nextDouble() {
         return secure().randomDouble();
     }
@@ -128,7 +133,9 @@ public class RandomUtils {
      * @throws IllegalArgumentException if {@code startInclusive > endExclusive} or if {@code startInclusive} is
      *                                  negative
      * @return the random double
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     public static double nextDouble(final double startInclusive, final double endExclusive) {
         return secure().randomDouble(startInclusive, endExclusive);
     }
@@ -139,7 +146,9 @@ public class RandomUtils {
      * @return the random float
      * @see #nextFloat(float, float)
      * @since 3.5
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     public static float nextFloat() {
         return secure().randomFloat();
     }
@@ -152,7 +161,9 @@ public class RandomUtils {
      * @throws IllegalArgumentException if {@code startInclusive > endExclusive} or if {@code startInclusive} is
      *                                  negative
      * @return the random float
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     public static float nextFloat(final float startInclusive, final float endExclusive) {
         return secure().randomFloat(startInclusive, endExclusive);
     }
@@ -163,7 +174,9 @@ public class RandomUtils {
      * @return the random integer
      * @see #nextInt(int, int)
      * @since 3.5
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     public static int nextInt() {
         return secure().randomInt();
     }
@@ -176,7 +189,9 @@ public class RandomUtils {
      * @throws IllegalArgumentException if {@code startInclusive > endExclusive} or if {@code startInclusive} is
      *                                  negative
      * @return the random integer
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     public static int nextInt(final int startInclusive, final int endExclusive) {
         return secure().randomInt(startInclusive, endExclusive);
     }
@@ -187,7 +202,9 @@ public class RandomUtils {
      * @return the random long
      * @see #nextLong(long, long)
      * @since 3.5
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     public static long nextLong() {
         return secure().randomLong();
     }
@@ -197,7 +214,9 @@ public class RandomUtils {
      *
      * @param n Bound on the random number to be returned. Must be positive.
      * @return a random {@code long} value between 0 (inclusive) and {@code n} (exclusive).
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     private static long nextLong(final long n) {
         return secure().randomLong(n);
     }
@@ -210,7 +229,9 @@ public class RandomUtils {
      * @throws IllegalArgumentException if {@code startInclusive > endExclusive} or if {@code startInclusive} is
      *                                  negative
      * @return the random long
+     * @deprecated Use {@link #secure()} or {@link #insecure()}.
      */
+    @Deprecated
     public static long nextLong(final long startInclusive, final long endExclusive) {
         return secure().randomLong(startInclusive, endExclusive);
     }
