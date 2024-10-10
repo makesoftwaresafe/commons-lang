@@ -45,15 +45,23 @@ The <action> type attribute can be add,update,fix,remove.
     <title>Apache Commons Lang Release Notes</title>
   </properties>
   <body>
-  <release version="3.17.1" date="YYYY-MM-DD" description="This is a feature and maintenance release. Java 8 or later is required.">
+  <release version="3.18.0" date="YYYY-MM-DD" description="This is a feature and maintenance release. Java 8 or later is required.">
     <!-- FIX -->
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">Fix flaky FileUtilsWaitForTest.testWaitForNegativeDuration().</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">Pick up exec-maven-plugin version from parent POM.</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">Speed up and sanitize StopWatchTest.</action>
-    <action                   type="fix" dev="ggregory" due-to="Fabrice Benhamouda">Fix handling of non-ASCII letters & numbers in RandomStringUtils #1273.</action> 
+    <action                   type="fix" dev="ggregory" due-to="Fabrice Benhamouda">Fix handling of non-ASCII letters and numbers in RandomStringUtils #1273.</action>
+    <action                   type="fix" dev="ggregory" due-to="OSS-Fuzz, Gary Gregory">Rewrite ClassUtils.getClass(...) without recursion to avoid StackOverflowError on very long inputs.
+                              OSS-Fuzz Issue 42522972: apache-commons-text:StringSubstitutorInterpolatorFuzzer: Security exception in org.apache.commons.lang3.ClassUtils.getClass.</action>
+    <action                   type="fix" dev="ggregory" due-to="Gary Gregory">Remove trailing whitespace in StopWatch exception messages.</action>
+    <action issue="LANG-1754" type="fix" dev="ggregory" due-to="vhbcm">Use getAllSuperclassesAndInterfaces() in getMatchingMethod() #1289.</action>
     <!-- ADD -->
+    <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add Strings and refactor StringUtils.</action>
+    <action issue="LANG-1747" type="add" dev="ggregory" due-to="Oliver B. Fischer, Gary Gregory">Add StopWatch.run([Failable]Runnable) and get([Failable]Supplier).</action>
+    <action                   type="add" dev="ggregory" due-to="Gary Gregory">JavaVersion.JAVA_23.</action>
+    <action                   type="add" dev="ggregory" due-to="Gary Gregory">SystemUtils.IS_JAVA_23.</action>
     <!-- UPDATE -->
-    <action                   type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 73 to 74 #1267.</action>
+    <action                   type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 73 to 77 #1267, #1277, #1283, #1288.</action>
   </release>
   <release version="3.17.0" date="2024-08-24" description="This is a feature and maintenance release. Java 8 or later is required.">
     <!-- FIX -->
@@ -613,7 +621,7 @@ The <action> type attribute can be add,update,fix,remove.
     <action issue="LANG-1426" type="fix" dev="ggregory" due-to="Brower, Mikko Maunu, Suraj Gautam">Corrected usage examples in Javadocs #458.</action>
     <action                   type="update" dev="ggregory" due-to="Jonathan Leitschuh, Bruno P. Kinoshita, Rob Tompkins, Gary Gregory">Improve Javadoc based on the discussion of the GitHub PR #459.</action>
     <action                   type="update" dev="ggregory">maven-checkstyle-plugin 3.0.0 -> 3.1.0.</action>
-    <action issue="LANG-696"  type="update" dev="ggregory" due-to="Peter Verhas">Update documentation related to the issue LANG-696 #449.</action>
+    <action issue="LANG-696"  type="update" dev="ggregory" due-to="Peter Verhas">Update documentation and tests related to the issue LANG-696 #449.</action>
     <action                   type="update" dev="ggregory" due-to="Peter Verhas">AnnotationUtils little cleanup #467.</action>
     <action issue="LANG-1494" type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.lang3.time.Calendars.</action>
     <action issue="LANG-1495" type="add" dev="ggregory" due-to="Cheong Voon Leong">Add EnumUtils getEnum() methods with default values #475.</action>

@@ -29,6 +29,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.Builder;
 
 /**
@@ -2035,7 +2036,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
      * @return the first index of the string, or -1 if not found
      */
     public int indexOf(final String str, final int startIndex) {
-        return StringUtils.indexOf(this, str, startIndex);
+        return Strings.CS.indexOf(this, str, startIndex);
     }
 
     /**
@@ -2357,7 +2358,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
      * @return the last index of the string, or -1 if not found
      */
     public int lastIndexOf(final String str, final int startIndex) {
-        return StringUtils.lastIndexOf(this, str, startIndex);
+        return Strings.CS.lastIndexOf(this, str, startIndex);
     }
 
     /**

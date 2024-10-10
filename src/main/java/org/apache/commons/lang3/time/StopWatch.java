@@ -21,10 +21,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.function.FailableRunnable;
+import org.apache.commons.lang3.function.FailableSupplier;
 
 /**
  * {@link StopWatch} provides a convenient API for timings.
@@ -149,23 +151,23 @@ public class StopWatch {
         };
 
         /**
-         * Tests whether the StopWatch is started. A suspended StopWatch is also started.
+         * Tests whether this StopWatch is started. A suspended StopWatch is also started.
          *
-         * @return boolean If the StopWatch is started.
+         * @return boolean If this StopWatch is started.
          */
         abstract boolean isStarted();
 
         /**
-         * Tests whether the StopWatch is stopped. A StopWatch which is not yet started and explicitly stopped is considered stopped.
+         * Tests whether this StopWatch is stopped. A StopWatch which is not yet started and explicitly stopped is considered stopped.
          *
-         * @return boolean If the StopWatch is stopped.
+         * @return boolean If this StopWatch is stopped.
          */
         abstract boolean isStopped();
 
         /**
-         * Tests whether the StopWatch is suspended.
+         * Tests whether this StopWatch is suspended.
          *
-         * @return boolean If the StopWatch is suspended.
+         * @return boolean If this StopWatch is suspended.
          */
         abstract boolean isSuspended();
     }
@@ -204,12 +206,12 @@ public class StopWatch {
     private final String message;
 
     /**
-     * The current running state of the StopWatch.
+     * The current running state of this StopWatch.
      */
     private State runningState = State.UNSTARTED;
 
     /**
-     * Whether the StopWatch has a split time recorded.
+     * Whether this StopWatch has a split time recorded.
      */
     private SplitState splitState = SplitState.UNSPLIT;
 
@@ -226,7 +228,7 @@ public class StopWatch {
      * nanoTime is only for elapsed time so we need to also store the currentTimeMillis to maintain the old getStartTime API.
      * </p>
      * <p>
-     * On Java 8, Instant has millisecond precision, only later versions use nanoseconds.
+     * On Java 8, Instant has millisecond precision, later versions use nanoseconds.
      * </p>
      */
     private Instant startInstant;
@@ -237,7 +239,7 @@ public class StopWatch {
      * nanoTime is only for elapsed time so we need to also store the currentTimeMillis to maintain the old getStartTime API.
      * </p>
      * <p>
-     * On Java 8, Instant has millisecond precision, only later versions use nanoseconds.
+     * On Java 8, Instant has millisecond precision, later versions use nanoseconds.
      * </p>
      */
     private Instant stopInstant;
@@ -287,7 +289,24 @@ public class StopWatch {
     }
 
     /**
-     * Gets the Duration on the StopWatch.
+     * Delegates to {@link Supplier#get()} while recording the duration of the call.
+     *
+     * @param <T>      the type of results supplied by this supplier.
+     * @param supplier The supplier to {@link Supplier#get()}.
+     * @return a result from the given Supplier.
+     * @since 3.18.0
+     */
+    public <T> T get(final Supplier<T> supplier) {
+        startResume();
+        try {
+            return supplier.get();
+        } finally {
+            suspend();
+        }
+    }
+
+    /**
+     * Gets the Duration on this StopWatch.
      *
      * <p>
      * This is either the Duration between the start and the moment this method is called, or the Duration between start and stop.
@@ -322,20 +341,22 @@ public class StopWatch {
      * @since 3.0
      */
     public long getNanoTime() {
-        if (runningState == State.STOPPED || runningState == State.SUSPENDED) {
+        switch (runningState) {
+        case STOPPED:
+        case SUSPENDED:
             return stopTimeNanos - startTimeNanos;
-        }
-        if (runningState == State.UNSTARTED) {
+        case UNSTARTED:
             return 0;
-        }
-        if (runningState == State.RUNNING) {
+        case RUNNING:
             return System.nanoTime() - startTimeNanos;
+        default:
+            break;
         }
         throw new IllegalStateException("Illegal running state has occurred.");
     }
 
     /**
-     * Gets the split Duration on the StopWatch.
+     * Gets the split Duration on this StopWatch.
      *
      * <p>
      * This is the Duration between start and latest split.
@@ -343,7 +364,7 @@ public class StopWatch {
      *
      * @return the split Duration
      *
-     * @throws IllegalStateException if the StopWatch has not yet been split.
+     * @throws IllegalStateException if this StopWatch has not yet been split.
      * @since 3.16.0
      */
     public Duration getSplitDuration() {
@@ -359,7 +380,7 @@ public class StopWatch {
      *
      * @return the split time in nanoseconds
      *
-     * @throws IllegalStateException if the StopWatch has not yet been split.
+     * @throws IllegalStateException if this StopWatch has not yet been split.
      * @since 3.0
      */
     public long getSplitNanoTime() {
@@ -370,7 +391,7 @@ public class StopWatch {
     }
 
     /**
-     * Gets the split time on the StopWatch.
+     * Gets the split time on this StopWatch.
      *
      * <p>
      * This is the time between start and latest split.
@@ -378,7 +399,7 @@ public class StopWatch {
      *
      * @return the split time in milliseconds
      *
-     * @throws IllegalStateException if the StopWatch has not yet been split.
+     * @throws IllegalStateException if this StopWatch has not yet been split.
      * @since 2.1
      * @deprecated Use {@link #getSplitDuration()}.
      */
@@ -444,7 +465,26 @@ public class StopWatch {
     }
 
     /**
-     * Gets the time on the StopWatch.
+     * Delegates to {@link FailableSupplier#get()} while recording the duration of the call.
+     *
+     * @param <T>      the type of results supplied by this supplier.
+     * @param <E>      The kind of thrown exception or error.
+     * @param supplier The supplier to {@link Supplier#get()}.
+     * @return a result from the given Supplier.
+     * @throws Throwable if the supplier fails.
+     * @since 3.18.0
+     */
+    public <T, E extends Throwable> T getT(final FailableSupplier<T, E> supplier) throws Throwable {
+        startResume();
+        try {
+            return supplier.get();
+        } finally {
+            suspend();
+        }
+    }
+
+    /**
+     * Gets the time on this StopWatch.
      *
      * <p>
      * This is either the time between the start and the moment this method is called, or the amount of time between start and stop.
@@ -463,8 +503,8 @@ public class StopWatch {
      *
      * <p>
      * This is either the time between the start and the moment this method is called, or the amount of time between start and stop. The resulting time will be
-     * expressed in the desired TimeUnit with any remainder rounded down. For example, if the specified unit is {@code TimeUnit.HOURS} and the StopWatch time is
-     * 59 minutes, then the result returned will be {@code 0}.
+     * expressed in the desired TimeUnit with any remainder rounded down. For example, if the specified unit is {@code TimeUnit.HOURS} and this StopWatch time
+     * is 59 minutes, then the result returned will be {@code 0}.
      * </p>
      *
      * @param timeUnit the unit of time, not null
@@ -476,9 +516,9 @@ public class StopWatch {
     }
 
     /**
-     * Tests whether the StopWatch is started. A suspended StopWatch is also started watch.
+     * Tests whether this StopWatch is started. A suspended StopWatch is also started watch.
      *
-     * @return boolean If the StopWatch is started.
+     * @return boolean If this StopWatch is started.
      * @since 3.2
      */
     public boolean isStarted() {
@@ -486,9 +526,9 @@ public class StopWatch {
     }
 
     /**
-     * Tests whether StopWatch is stopped. The StopWatch which's not yet started and explicitly stopped StopWatch is considered as stopped.
+     * Tests whether StopWatch is stopped. this StopWatch which's not yet started and explicitly stopped StopWatch is considered as stopped.
      *
-     * @return boolean If the StopWatch is stopped.
+     * @return boolean If this StopWatch is stopped.
      * @since 3.2
      */
     public boolean isStopped() {
@@ -496,9 +536,9 @@ public class StopWatch {
     }
 
     /**
-     * Tests whether the StopWatch is suspended.
+     * Tests whether this StopWatch is suspended.
      *
-     * @return boolean If the StopWatch is suspended.
+     * @return boolean If this StopWatch is suspended.
      * @since 3.2
      */
     public boolean isSuspended() {
@@ -516,7 +556,7 @@ public class StopWatch {
     }
 
     /**
-     * Resets the StopWatch. Stops it if need be.
+     * Resets this StopWatch. Stops it if need be.
      *
      * <p>
      * This method clears the internal values to allow the object to be reused.
@@ -528,20 +568,52 @@ public class StopWatch {
     }
 
     /**
-     * Resumes the StopWatch after a suspend.
+     * Resumes this StopWatch after a suspend.
      *
      * <p>
      * This method resumes the watch after it was suspended. The watch will not include time between the suspend and resume calls in the total time.
      * </p>
      *
-     * @throws IllegalStateException if the StopWatch has not been suspended.
+     * @throws IllegalStateException if this StopWatch has not been suspended.
      */
     public void resume() {
         if (runningState != State.SUSPENDED) {
-            throw new IllegalStateException("Stopwatch must be suspended to resume. ");
+            throw new IllegalStateException("Stopwatch must be suspended to resume.");
         }
         startTimeNanos += System.nanoTime() - stopTimeNanos;
         runningState = State.RUNNING;
+    }
+
+    /**
+     * Delegates to {@link Runnable#run()} while recording the duration of the call.
+     *
+     * @param runnable The runnable to {@link Runnable#run()}.
+     * @since 3.18.0
+     */
+    public void run(final Runnable runnable) {
+        startResume();
+        try {
+            runnable.run();
+        } finally {
+            suspend();
+        }
+    }
+
+    /**
+     * Delegates to {@link FailableRunnable#run()} while recording the duration of the call.
+     *
+     * @param <E>      The kind of {@link Throwable}.
+     * @param runnable The runnable to {@link FailableRunnable#run()}.
+     * @throws Throwable Thrown by {@link FailableRunnable#run()}.
+     * @since 3.18.0
+     */
+    public <E extends Throwable> void runT(final FailableRunnable<E> runnable) throws Throwable {
+        startResume();
+        try {
+            runnable.run();
+        } finally {
+            suspend();
+        }
     }
 
     /**
@@ -552,31 +624,31 @@ public class StopWatch {
      * timing from the original start point.
      * </p>
      *
-     * @throws IllegalStateException if the StopWatch is not running.
+     * @throws IllegalStateException if this StopWatch is not running.
      */
     public void split() {
         if (runningState != State.RUNNING) {
-            throw new IllegalStateException("Stopwatch is not running. ");
+            throw new IllegalStateException("Stopwatch is not running.");
         }
         stopTimeNanos = System.nanoTime();
         splitState = SplitState.SPLIT;
     }
 
     /**
-     * Starts the StopWatch.
+     * Starts this StopWatch.
      *
      * <p>
      * This method starts a new timing session, clearing any previous values.
      * </p>
      *
-     * @throws IllegalStateException if the StopWatch is already running.
+     * @throws IllegalStateException if this StopWatch is already running.
      */
     public void start() {
         if (runningState == State.STOPPED) {
-            throw new IllegalStateException("Stopwatch must be reset before being restarted. ");
+            throw new IllegalStateException("Stopwatch must be reset before being restarted.");
         }
         if (runningState != State.UNSTARTED) {
-            throw new IllegalStateException("Stopwatch already started. ");
+            throw new IllegalStateException("Stopwatch already started.");
         }
         startTimeNanos = System.nanoTime();
         startInstant = Instant.now();
@@ -584,17 +656,28 @@ public class StopWatch {
     }
 
     /**
-     * Stops the StopWatch.
+     * Starts or resumes this StopWatch.
+     */
+    private void startResume() {
+        if (isStopped()) {
+            start();
+        } else if (isSuspended()) {
+            resume();
+        }
+    }
+
+    /**
+     * Stops this StopWatch.
      *
      * <p>
      * This method ends a new timing session, allowing the time to be retrieved.
      * </p>
      *
-     * @throws IllegalStateException if the StopWatch is not running.
+     * @throws IllegalStateException if this StopWatch is not running.
      */
     public void stop() {
         if (runningState != State.RUNNING && runningState != State.SUSPENDED) {
-            throw new IllegalStateException("Stopwatch is not running. ");
+            throw new IllegalStateException("Stopwatch is not running.");
         }
         if (runningState == State.RUNNING) {
             stopTimeNanos = System.nanoTime();
@@ -604,17 +687,17 @@ public class StopWatch {
     }
 
     /**
-     * Suspends the StopWatch for later resumption.
+     * Suspends this StopWatch for later resumption.
      *
      * <p>
      * This method suspends the watch until it is resumed. The watch will not include time between the suspend and resume calls in the total time.
      * </p>
      *
-     * @throws IllegalStateException if the StopWatch is not currently running.
+     * @throws IllegalStateException if this StopWatch is not currently running.
      */
     public void suspend() {
         if (runningState != State.RUNNING) {
-            throw new IllegalStateException("Stopwatch must be running to suspend. ");
+            throw new IllegalStateException("Stopwatch must be running to suspend.");
         }
         stopTimeNanos = System.nanoTime();
         stopInstant = Instant.now();
@@ -622,7 +705,7 @@ public class StopWatch {
     }
 
     /**
-     * Gets a summary of the split time that the StopWatch recorded as a string.
+     * Gets a summary of the split time that this StopWatch recorded as a string.
      *
      * <p>
      * The format used is ISO 8601-like, [<i>message</i> ]<i>hours</i>:<i>minutes</i>:<i>seconds</i>.<i>milliseconds</i>.
@@ -639,7 +722,7 @@ public class StopWatch {
     }
 
     /**
-     * Gets a summary of the time that the StopWatch recorded as a string.
+     * Gets a summary of the time that this StopWatch recorded as a string.
      *
      * <p>
      * The format used is ISO 8601-like, [<i>message</i> ]<i>hours</i>:<i>minutes</i>:<i>seconds</i>.<i>milliseconds</i>.
@@ -656,17 +739,17 @@ public class StopWatch {
     }
 
     /**
-     * Removes a split.
+     * Removes the split.
      *
      * <p>
      * This method clears the stop time. The start time is unaffected, enabling timing from the original start point to continue.
      * </p>
      *
-     * @throws IllegalStateException if the StopWatch has not been split.
+     * @throws IllegalStateException if this StopWatch has not been split.
      */
     public void unsplit() {
         if (splitState != SplitState.SPLIT) {
-            throw new IllegalStateException("Stopwatch has not been split. ");
+            throw new IllegalStateException("Stopwatch has not been split.");
         }
         splitState = SplitState.UNSPLIT;
     }

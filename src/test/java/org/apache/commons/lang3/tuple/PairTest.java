@@ -23,20 +23,33 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.AbstractMap;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test the Pair class.
  */
 public class PairTest extends AbstractLangTest {
+
+    public static Stream<Class<? extends Map>> mapClassFactory() {
+        return Stream.of(ConcurrentHashMap.class, ConcurrentSkipListMap.class, HashMap.class, TreeMap.class, WeakHashMap.class, LinkedHashMap.class);
+    }
 
     @Test
     public void testAccept() {
@@ -104,11 +117,6 @@ public class PairTest extends AbstractLangTest {
     }
 
     @Test
-    public void testConcurrentHashMapEntry() {
-        testMapEntry(new ConcurrentHashMap<>());
-    }
-
-    @Test
     public void testEmptyArrayGenerics() {
         final Pair<Integer, String>[] empty = Pair.emptyArray();
         assertEquals(0, empty.length);
@@ -119,6 +127,89 @@ public class PairTest extends AbstractLangTest {
         @SuppressWarnings("unchecked")
         final Pair<Integer, String>[] empty = (Pair<Integer, String>[]) Pair.EMPTY_ARRAY;
         assertEquals(0, empty.length);
+    }
+
+    @Test
+    public void testEqualsAnonynous() {
+        final Pair<String, String> pair = Pair.of("a", "b");
+        final String key = "a";
+        final String value = "b";
+        final Map.Entry<String, String> entry = new Map.Entry<String, String>() {
+
+            @Override
+            public boolean equals(final Object o) {
+                if (!(o instanceof Map.Entry)) {
+                    return false;
+                }
+                final Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+                // FYI java.util.AbstractMap.SimpleEntry.equals(Object) and JDK-8015417
+                return Objects.equals(getKey(), e.getKey()) && Objects.equals(getValue(), e.getValue());
+            }
+
+            @Override
+            public String getKey() {
+                return key;
+            }
+
+            @Override
+            public String getValue() {
+                return value;
+            }
+
+            @Override
+            public int hashCode() {
+                return (getKey() == null ? 0 : getKey().hashCode()) ^ (getValue() == null ? 0 : getValue().hashCode());
+            }
+
+            @Override
+            public String setValue(final String value) {
+                return null;
+            }
+        };
+        final Map.Entry<String, String> entry2 = new Map.Entry<String, String>() {
+
+            @Override
+            public boolean equals(final Object o) {
+                if (!(o instanceof Map.Entry)) {
+                    return false;
+                }
+                final Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+                // FYI java.util.AbstractMap.SimpleEntry.equals(Object) and JDK-8015417
+                return Objects.equals(getKey(), e.getKey()) && Objects.equals(getValue(), e.getValue());
+            }
+
+            @Override
+            public String getKey() {
+                return key;
+            }
+
+            @Override
+            public String getValue() {
+                return value;
+            }
+            @Override
+            public int hashCode() {
+                return (getKey() == null ? 0 : getKey().hashCode()) ^ (getValue() == null ? 0 : getValue().hashCode());
+            }
+
+            @Override
+            public String setValue(final String value) {
+                return null;
+            }
+        };
+        assertTrue(pair.equals(entry));
+        assertEquals(pair.hashCode(), entry.hashCode());
+        assertTrue(pair.equals(entry2));
+        assertEquals(pair.hashCode(), entry2.hashCode());
+        assertTrue(entry.equals(entry));
+        assertEquals(entry.hashCode(), entry.hashCode());
+        assertTrue(entry2.equals(entry2));
+        assertEquals(entry2.hashCode(), entry2.hashCode());
+        assertTrue(entry.equals(entry2));
+        assertEquals(entry.hashCode(), entry2.hashCode());
+        assertTrue(entry.equals(pair));
+        assertEquals(entry.hashCode(), pair.hashCode());
+
     }
 
     @Test
@@ -133,9 +224,14 @@ public class PairTest extends AbstractLangTest {
         assertEquals("(Key,Value)", String.format("%1$s", pair));
     }
 
-    @Test
-    public void testHashMapEntry() {
-        testMapEntry(new HashMap<>());
+    @ParameterizedTest()
+    @MethodSource("org.apache.commons.lang3.tuple.PairTest#mapClassFactory()")
+    public <K, V> void testMapEntries(final Class<Map<Integer, String>> clazz) throws InstantiationException, IllegalAccessException {
+        testMapEntry(clazz.newInstance());
+    }
+
+    public <K, V> void testMapEntries(final Map<Integer, String> map) {
+        testMapEntry(map);
     }
 
     private void testMapEntry(final Map<Integer, String> map) {
@@ -163,6 +259,18 @@ public class PairTest extends AbstractLangTest {
         final Pair<String, String> pair = Pair.ofNonNull("x", "y");
         assertEquals("x", pair.getLeft());
         assertEquals("y", pair.getRight());
+    }
+
+    @Test
+    public void testPairOfAbstractMapSimpleEntry() {
+        final Entry<Integer, String> entry = new AbstractMap.SimpleEntry<>(0, "foo");
+        final Pair<Integer, String> pair = Pair.of(entry);
+        assertEquals(entry.getKey(), pair.getLeft());
+        assertEquals(entry.getValue(), pair.getRight());
+        assertEquals(entry, pair);
+        assertEquals(entry.hashCode(), pair.hashCode());
+        assertEquals(pair, entry);
+        assertEquals(pair.hashCode(), entry.hashCode());
     }
 
     @Test
