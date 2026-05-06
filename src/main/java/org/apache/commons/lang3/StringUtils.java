@@ -7884,6 +7884,10 @@ public class StringUtils {
      * <p>
      * Decomposes ligatures and digraphs per the KD column in the <a href = "https://www.unicode.org/charts/normalization/">Unicode Normalization Chart.</a>
      * </p>
+     * <p>
+     * Be aware that this NFKD compatibility decomposition can map non-letter compatibility forms (fullwidth, small-form, math-symbol variants of {@code <},
+     * {@code >}, {@code /}, and so on) to their ASCII counterparts.
+     * </p>
      *
      * <pre>
      * StringUtils.stripAccents(null)         = null
