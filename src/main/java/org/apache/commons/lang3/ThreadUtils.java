@@ -471,8 +471,11 @@ public class ThreadUtils {
 
     /**
      * Waits for the given thread to die for the given duration. Implemented using {@link Thread#join(long, int)}.
+     * <p>
+     * Calling this method with {@link Duration#ZERO} is equivalent to calling {@link Thread#join(long, int) Thread.join(0, 0)}, which waits forever.
+     * </p>
      *
-     * @param thread The thread to join.
+     * @param thread   The thread to join.
      * @param duration How long to wait.
      * @throws InterruptedException if any thread has interrupted the current thread.
      * @see Thread#join(long, int)
