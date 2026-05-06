@@ -186,8 +186,13 @@ class ThreadUtilsTest extends AbstractLangTest {
 
     @Test
     void testJoinDuration() throws InterruptedException {
-        ThreadUtils.join(new Thread(), Duration.ZERO);
         ThreadUtils.join(new Thread(), Duration.ofMillis(1));
+        ThreadUtils.join(new Thread(), Duration.ofMillis(2));
+    }
+
+    @Test
+    void testJoinDurationZero() throws InterruptedException {
+        ThreadUtils.join(new Thread(), Duration.ZERO);
     }
 
     @Test
