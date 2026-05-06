@@ -138,6 +138,7 @@ java.lang.NullPointerException: Cannot invoke
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">Fix typo in SystemProperties.JDK_XML_ENTITY_REPLACEMENT_LIMIT (#1631).</action>
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">Harden Range.readObject() to reject bad cached hash code (#1633).</action>
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">Harden Fraction.readObject() to reject bad cached hash code (#1634).</action>
+    <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">NumberUtils.createNumber(String): Float shortcut can bypass exact decimal parsing (#1635).</action>
     <!-- ADD -->
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add JavaVersion.JAVA_27.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add SystemUtils.IS_JAVA_27.</action>
