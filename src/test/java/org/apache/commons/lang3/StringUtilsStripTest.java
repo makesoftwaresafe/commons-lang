@@ -87,6 +87,8 @@ class StringUtilsStripTest extends AbstractLangTest {
         assertEquals(gt, StringUtils.stripAccents("\uFE65"));
         assertEquals(gt, StringUtils.stripAccents("\uFE65"));
         assertEquals(gt, StringUtils.stripAccents("\u226F"));
+        //
+        assertEquals("</script>", StringUtils.stripAccents("\uFF1C\uFF0Fscript\uFF1E"));
     }
 
     @Test
