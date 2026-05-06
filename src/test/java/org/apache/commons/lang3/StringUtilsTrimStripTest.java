@@ -68,6 +68,27 @@ class StringUtilsTrimStripTest extends AbstractLangTest {
         assertEquals(input, StringUtils.stripAccents(input), "Failed to handle Korean text");
     }
 
+    /**
+     * Decomposes ligatures and digraphs per the KD column in the <a href = "https://www.unicode.org/charts/normalization/">Unicode Normalization Chart.</a>
+     */
+    @Test
+    void testStripAccentsSymbolMath() {
+        // Noop
+        final String lt = "<";
+        assertEquals(lt, StringUtils.stripAccents(lt));
+        // https://www.unicode.org/charts/normalization/chart_Symbol-Math.html
+        assertEquals(lt, StringUtils.stripAccents("\uFE64"));
+        assertEquals(lt, StringUtils.stripAccents("\uFF1C"));
+        assertEquals(lt, StringUtils.stripAccents("\u226E"));
+        // Noop
+        final String gt = ">";
+        assertEquals(gt, StringUtils.stripAccents(gt));
+        // https://www.unicode.org/charts/normalization/chart_Symbol-Math.html
+        assertEquals(gt, StringUtils.stripAccents("\uFE65"));
+        assertEquals(gt, StringUtils.stripAccents("\uFE65"));
+        assertEquals(gt, StringUtils.stripAccents("\u226F"));
+    }
+
     @Test
     void testStripAccentsTWithStroke() {
         assertEquals("T t", StringUtils.stripAccents("\u0166 \u0167"));
