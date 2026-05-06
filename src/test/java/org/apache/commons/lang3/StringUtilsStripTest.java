@@ -24,9 +24,9 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link StringUtils} Trim/Strip methods.
+ * Tests {@link StringUtils} strip methods.
  */
-class StringUtilsTrimStripTest extends AbstractLangTest {
+class StringUtilsStripTest extends AbstractLangTest {
     private static final String FOO = "foo";
 
     @Test
@@ -259,44 +259,5 @@ class StringUtilsTrimStripTest extends AbstractLangTest {
         assertEquals("ab c", StringUtils.stripToNull("  ab c  "));
         assertEquals(StringUtilsTest.NON_WHITESPACE,
                 StringUtils.stripToNull(StringUtilsTest.WHITESPACE + StringUtilsTest.NON_WHITESPACE + StringUtilsTest.WHITESPACE));
-    }
-
-    @Test
-    void testTrim() {
-        assertEquals(FOO, StringUtils.trim(FOO + "  "));
-        assertEquals(FOO, StringUtils.trim(" " + FOO + "  "));
-        assertEquals(FOO, StringUtils.trim(" " + FOO));
-        assertEquals(FOO, StringUtils.trim(FOO + ""));
-        assertEquals("", StringUtils.trim(" \t\r\n\b "));
-        assertEquals("", StringUtils.trim(StringUtilsTest.TRIMMABLE));
-        assertEquals(StringUtilsTest.NON_TRIMMABLE, StringUtils.trim(StringUtilsTest.NON_TRIMMABLE));
-        assertEquals("", StringUtils.trim(""));
-        assertNull(StringUtils.trim(null));
-    }
-
-    @Test
-    void testTrimToEmpty() {
-        assertEquals(FOO, StringUtils.trimToEmpty(FOO + "  "));
-        assertEquals(FOO, StringUtils.trimToEmpty(" " + FOO + "  "));
-        assertEquals(FOO, StringUtils.trimToEmpty(" " + FOO));
-        assertEquals(FOO, StringUtils.trimToEmpty(FOO + ""));
-        assertEquals("", StringUtils.trimToEmpty(" \t\r\n\b "));
-        assertEquals("", StringUtils.trimToEmpty(StringUtilsTest.TRIMMABLE));
-        assertEquals(StringUtilsTest.NON_TRIMMABLE, StringUtils.trimToEmpty(StringUtilsTest.NON_TRIMMABLE));
-        assertEquals("", StringUtils.trimToEmpty(""));
-        assertEquals("", StringUtils.trimToEmpty(null));
-    }
-
-    @Test
-    void testTrimToNull() {
-        assertEquals(FOO, StringUtils.trimToNull(FOO + "  "));
-        assertEquals(FOO, StringUtils.trimToNull(" " + FOO + "  "));
-        assertEquals(FOO, StringUtils.trimToNull(" " + FOO));
-        assertEquals(FOO, StringUtils.trimToNull(FOO + ""));
-        assertNull(StringUtils.trimToNull(" \t\r\n\b "));
-        assertNull(StringUtils.trimToNull(StringUtilsTest.TRIMMABLE));
-        assertEquals(StringUtilsTest.NON_TRIMMABLE, StringUtils.trimToNull(StringUtilsTest.NON_TRIMMABLE));
-        assertNull(StringUtils.trimToNull(""));
-        assertNull(StringUtils.trimToNull(null));
     }
 }
