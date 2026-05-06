@@ -192,6 +192,7 @@ class ThreadUtilsTest extends AbstractLangTest {
 
     @Test
     void testJoinDurationZero() throws InterruptedException {
+        // This test doesn't wait forever because the thread is not alive, so the call returns immediately.
         ThreadUtils.join(new Thread(), Duration.ZERO);
     }
 
