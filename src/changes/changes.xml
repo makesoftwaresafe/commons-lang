@@ -140,6 +140,7 @@ java.lang.NullPointerException: Cannot invoke
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">Harden Fraction.readObject() to reject bad cached hash code (#1634).</action>
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">NumberUtils.createNumber(String): Float shortcut can bypass exact decimal parsing (#1635).</action>
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">StringUtils.joins() for primitive types can throw OOME before index check (#1636).</action>
+    <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">Annotation lookup in MethodUtils.getAnnotation(Method, Class, boolean, boolean) matches unrelated overloads via assignable-parameter resolution (#1637).</action>
     <!-- ADD -->
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add JavaVersion.JAVA_27.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add SystemUtils.IS_JAVA_27.</action>
