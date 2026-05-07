@@ -141,6 +141,8 @@ java.lang.NullPointerException: Cannot invoke
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">NumberUtils.createNumber(String): Float shortcut can bypass exact decimal parsing (#1635).</action>
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">StringUtils.joins() for primitive types can throw OOME before index check (#1636).</action>
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">Annotation lookup in MethodUtils.getAnnotation(Method, Class, boolean, boolean) matches unrelated overloads via assignable-parameter resolution (#1637).</action>
+    <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">RandomStringUtils.random(...): A custom chars array throws IllegalArgumentException because validation loops treat the loop index as a char code point instead of an index into the chars array (#1638).</action>
+    <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">RandomStringUtils.random(...): Can hang when the specified [start, end) range contains ONLY rejected code points (UNASSIGNED, PRIVATE_USE, SURROGATE). The loop increments count and retries indefinitely (#1638).</action>
     <!-- ADD -->
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add JavaVersion.JAVA_27.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add SystemUtils.IS_JAVA_27.</action>
