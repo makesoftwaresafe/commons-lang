@@ -144,7 +144,7 @@ java.lang.NullPointerException: Cannot invoke
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">RandomStringUtils.random(...): A custom chars array throws IllegalArgumentException because validation loops treat the loop index as a char code point instead of an index into the chars array (#1638).</action>
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">RandomStringUtils.random(...): Can hang when the specified [start, end) range contains ONLY rejected code points (UNASSIGNED, PRIVATE_USE, SURROGATE). The loop increments count and retries indefinitely (#1638).</action>
     <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">TimedSemaphore.shutdown() must wake threads blocked in acquire() (#1639).</action>
-    <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">NaN bypass in primitive double range validators (#1640).</action>    
+    <action                   type="fix" dev="ggregory" due-to="Omkhar Arasaratnam, Gary Gregory">NaN bypass in primitive double range validators (#1640).</action>
     <!-- ADD -->
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add JavaVersion.JAVA_27.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add SystemUtils.IS_JAVA_27.</action>
@@ -153,6 +153,7 @@ java.lang.NullPointerException: Cannot invoke
     <action                   type="add" dev="ggregory" due-to="Gary Gregory, Theodora Anastasia Lazaridou">Add long support to BitField #1561.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add ArrayUtils.getDimensions(Object).</action>
     <action issue="LANG-1707" type="add" dev="ggregory" due-to="Ivan Malutin, Gilles Sadowski, Gary Gregory">Add ArrayUtils.concat() methods for concatenating multiple arrays #1519.</action>
+    <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add FailableConsumer.accept(FailableConsumer, T) (#1641).</action>
     <!-- UPDATE -->
     <action                   type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 92 to 99 #1498.</action>
     <action                   type="update" dev="ggregory" due-to="Gary Gregory">[test] Bump org.apache.commons:commons-text from 1.14.0 to 1.15.0.</action>
