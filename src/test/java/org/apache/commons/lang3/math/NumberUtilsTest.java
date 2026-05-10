@@ -1058,8 +1058,8 @@ class NumberUtilsTest extends AbstractLangTest {
     void testIsParsableInfinity() {
         // sanity checks
         final String s = "Infinity";
-        assertEquals(Double.NaN, Double.parseDouble(s));
-        assertEquals(Float.NaN, Float.parseFloat(s));
+        assertEquals(Double.POSITIVE_INFINITY, Double.parseDouble(s));
+        assertEquals(Float.POSITIVE_INFINITY, Float.parseFloat(s));
         // isParsable
         assertTrue(NumberUtils.isParsable(s));
     }
@@ -1068,8 +1068,8 @@ class NumberUtilsTest extends AbstractLangTest {
     void testIsParsableInfinityNegative() {
         // sanity checks
         final String s = "-Infinity";
-        assertEquals(Double.NaN, Double.parseDouble(s));
-        assertEquals(Float.NaN, Float.parseFloat(s));
+        assertEquals(Double.NEGATIVE_INFINITY, Double.parseDouble(s));
+        assertEquals(Float.NEGATIVE_INFINITY, Float.parseFloat(s));
         // isParsable
         assertTrue(NumberUtils.isParsable(s));
     }
@@ -1078,8 +1078,8 @@ class NumberUtilsTest extends AbstractLangTest {
     void testIsParsableInfinityPositive() {
         // sanity checks
         final String s = "+Infinity";
-        assertEquals(Double.NaN, Double.parseDouble(s));
-        assertEquals(Float.NaN, Float.parseFloat(s));
+        assertEquals(Double.POSITIVE_INFINITY, Double.parseDouble(s));
+        assertEquals(Float.POSITIVE_INFINITY, Float.parseFloat(s));
         // isParsable
         assertTrue(NumberUtils.isParsable(s));
     }
