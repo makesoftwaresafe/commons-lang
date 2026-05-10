@@ -1601,6 +1601,9 @@ public final class SystemProperties {
     /**
      * Gets the current value for the property named {@code "SimpleClassName.Key"} as a {@code boolean}.
      * <p>
+     * The parsing rules are as {@link Boolean#parseBoolean(String)}.
+     * </p>
+     * <p>
      * If a {@link SecurityException} is caught, the return value is {@code null}.
      * </p>
      *
@@ -1608,6 +1611,7 @@ public final class SystemProperties {
      * @param key             The subkey.
      * @param defaultIfAbsent The default value.
      * @return an int or {@code defaultIfAbsent}'s value.
+     * @see Boolean#parseBoolean(String)
      * @see Class#getSimpleName()
      * @since 3.19.0
      */
@@ -1618,12 +1622,16 @@ public final class SystemProperties {
     /**
      * Gets the current value for the property named {@code key} as a {@code boolean}.
      * <p>
+     * The parsing rules are as {@link Boolean#parseBoolean(String)}.
+     * </p>
+     * <p>
      * If a {@link SecurityException} is caught, the return value is {@code null}.
      * </p>
      *
      * @param key             The key.
      * @param defaultIfAbsent The default value.
      * @return a {@code boolean} or {@code defaultIfAbsent}'s value.
+     * @see Boolean#parseBoolean(String)
      */
     public static boolean getBoolean(final String key, final BooleanSupplier defaultIfAbsent) {
         final String str = getProperty(key);
@@ -1933,6 +1941,9 @@ public final class SystemProperties {
     /**
      * Gets the current value for the property named {@code "SimpleClassName.Key"} as an {@code int}.
      * <p>
+     * The parsing rules are as {@link Integer#parseInt(String)}.
+     * </p>
+     * <p>
      * If a {@link SecurityException} is caught, the return value is {@code null}.
      * </p>
      *
@@ -1940,6 +1951,7 @@ public final class SystemProperties {
      * @param key             The subkey.
      * @param defaultIfAbsent The default value.
      * @return an int or {@code defaultIfAbsent}'s value.
+     * @see Integer#parseInt(String)
      * @see Class#getSimpleName()
      * @since 3.19.0
      */
@@ -1950,12 +1962,16 @@ public final class SystemProperties {
     /**
      * Gets the current value for the property named {@code key} as an {@code int}.
      * <p>
+     * The parsing rules are as {@link Integer#parseInt(String)}.
+     * </p>
+     * <p>
      * If a {@link SecurityException} is caught, the return value is {@code null}.
      * </p>
      *
      * @param key             The key.
      * @param defaultIfAbsent The default value.
      * @return an {@code int} or {@code defaultIfAbsent}'s value.
+     * @see Integer#parseInt(String)
      */
     public static int getInt(final String key, final IntSupplier defaultIfAbsent) {
         final String str = getProperty(key);
@@ -3697,6 +3713,9 @@ public final class SystemProperties {
     /**
      * Gets the current value for the property named {@code "SimpleClassName.Key"} as a {@code long}.
      * <p>
+     * The parsing rules are as {@link Long#parseLong(String)}.
+     * </p>
+     * <p>
      * If a {@link SecurityException} is caught, the return value is {@code null}.
      * </p>
      *
@@ -3704,6 +3723,7 @@ public final class SystemProperties {
      * @param key             The subkey.
      * @param defaultIfAbsent The default value.
      * @return a long or {@code defaultIfAbsent}'s value.
+     * @see Long#parseLong(String)
      * @see Class#getSimpleName()
      * @since 3.19.0
      */
@@ -3714,12 +3734,16 @@ public final class SystemProperties {
     /**
      * Gets the current value for the property named {@code key} as a {@code long}.
      * <p>
+     * The parsing rules are as {@link Long#parseLong(String)}.
+     * </p>
+     * <p>
      * If a {@link SecurityException} is caught, the return value is {@code null}.
      * </p>
      *
      * @param key             The key.
      * @param defaultIfAbsent The default value.
      * @return a {@code long} or {@code defaultIfAbsent}'s value.
+     * @see Long#parseLong(String)
      */
     public static long getLong(final String key, final LongSupplier defaultIfAbsent) {
         final String str = getProperty(key);
