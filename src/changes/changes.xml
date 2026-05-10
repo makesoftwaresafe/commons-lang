@@ -155,6 +155,7 @@ java.lang.NullPointerException: Cannot invoke
     <action issue="LANG-1707" type="add" dev="ggregory" due-to="Ivan Malutin, Gilles Sadowski, Gary Gregory">Add ArrayUtils.concat() methods for concatenating multiple arrays #1519.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add FailableConsumer.accept(FailableConsumer, T) (#1641).</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add AutoCloseables #1643.</action>
+    <action issue="LANG-1711" type="add" dev="ggregory" due-to="Gary Gregory">Make object accessibility optional with AbstractReflection.AbstractBuilder.setForceAccessible(boolean) (#1558).</action>
     <!-- UPDATE -->
     <action                   type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 92 to 99 #1498.</action>
     <action                   type="update" dev="ggregory" due-to="Gary Gregory">[test] Bump org.apache.commons:commons-text from 1.14.0 to 1.15.0.</action>
