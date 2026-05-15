@@ -554,7 +554,7 @@ public class NumberUtils {
     }
 
     /**
-     * Checks whether the String is a valid Java number.
+     * Tests whether the String is a valid Java number.
      *
      * <p>
      * Valid numbers include hexadecimal marked with the {@code 0x} or {@code 0X} qualifier, octal numbers, scientific notation and numbers marked with a type
@@ -591,7 +591,7 @@ public class NumberUtils {
     }
 
     /**
-     * Checks whether the {@link String} contains only digit characters.
+     * Tests whether the {@link String} contains only digit characters.
      *
      * <p>
      * {@code null} and empty String will return {@code false}.
@@ -605,7 +605,7 @@ public class NumberUtils {
     }
 
     /**
-     * Checks whether the String is a valid Java number.
+     * Tests whether the String is a valid Java number.
      *
      * <p>
      * Valid numbers include hexadecimal marked with the {@code 0x} or {@code 0X} qualifier, octal numbers, scientific notation and numbers marked with a type
@@ -636,18 +636,16 @@ public class NumberUtils {
     }
 
     /**
-     * Checks whether the given String is a parsable number.
-     *
+     * Tests whether the given String is a parsable number.
      * <p>
      * Parsable numbers include those Strings understood by {@link Integer#parseInt(String)}, {@link Long#parseLong(String)}, {@link Float#parseFloat(String)}
      * or {@link Double#parseDouble(String)}. This method can be used instead of catching {@link java.text.ParseException} when calling one of those methods.
      * </p>
-     *
      * <p>
-     * Scientific notation (for example, {@code "1.2e-5"}) and type suffixes (e.g., {@code "2.0f"}, {@code "2.0d"}) are supported
-     * as they are valid for {@link Float#parseFloat(String)} and {@link Double#parseDouble(String)}.
+     * Scientific notation (for example, {@code "1.2e-5"}) and type suffixes (e.g., {@code "2.0f"}, {@code "2.0d"}) are supported as they are valid for
+     * {@link Float#parseFloat(String)} and {@link Double#parseDouble(String)} as are {@code "NaN"}, {@code "Infinity"}, {@code "+Infinity"}, and
+     * {@code "-Infinity"}. Callers requiring finite-only validation should compose with {@link Double#isFinite(double)}.
      * </p>
-     *
      * <p>
      * {@code null} and empty String will return {@code false}.
      * </p>
