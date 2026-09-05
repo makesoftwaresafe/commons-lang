@@ -288,9 +288,21 @@ public enum JavaVersion {
             final float v = toFloatVersion(versionStr);
             if (v - 1. < 1.) { // then we need to check decimals > .9
                 final int firstComma = Math.max(versionStr.indexOf('.'), versionStr.indexOf(','));
-                final int end = Math.max(versionStr.length(), versionStr.indexOf(',', firstComma));
-                if (Float.parseFloat(versionStr.substring(firstComma + 1, end)) > .9f) {
-                    return JAVA_RECENT;
+                // read up to the next separator if present, otherwise to the end of the string
+                // (this was previously an inverted Math.max that always selected the full string)
+                int end = versionStr.indexOf(',', firstComma + 1);
+                if (end == -1) {
+                    end = versionStr.length();
+                }
+                try {
+                    if (Float.parseFloat(versionStr.substring(firstComma + 1, end)) > .9f) {
+                        return JAVA_RECENT;
+                    }
+                } catch (final NumberFormatException e) {
+                    // malformed version string ("1.", "bogus"): the documented contract is to return null
+                    // for unknown versions rather than propagate an exception, which would otherwise poison
+                    // SystemUtils' static initializer for the class loader lifetime.
+                    return null;
                 }
             } else if (v > 10) {
                 return JAVA_RECENT;
