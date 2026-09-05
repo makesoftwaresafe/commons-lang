@@ -869,6 +869,7 @@ public class ArrayUtils {
      * @param array1  The first array whose elements are added to the new array.
      * @param array2  The second array whose elements are added to the new array.
      * @return The new boolean[] array or {@code null}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 2.1
      */
     public static boolean[] addAll(final boolean[] array1, final boolean... array2) {
@@ -878,7 +879,7 @@ public class ArrayUtils {
         if (array2 == null) {
             return clone(array1);
         }
-        final boolean[] joinedArray = new boolean[array1.length + array2.length];
+        final boolean[] joinedArray = new boolean[addExact(array1.length, array2)];
         System.arraycopy(array1, 0, joinedArray, 0, array1.length);
         System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
         return joinedArray;
@@ -901,6 +902,7 @@ public class ArrayUtils {
      * @param array1  The first array whose elements are added to the new array.
      * @param array2  The second array whose elements are added to the new array.
      * @return The new byte[] array or {@code null}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 2.1
      */
     public static byte[] addAll(final byte[] array1, final byte... array2) {
@@ -910,7 +912,7 @@ public class ArrayUtils {
         if (array2 == null) {
             return clone(array1);
         }
-        final byte[] joinedArray = new byte[array1.length + array2.length];
+        final byte[] joinedArray = new byte[addExact(array1.length, array2)];
         System.arraycopy(array1, 0, joinedArray, 0, array1.length);
         System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
         return joinedArray;
@@ -933,6 +935,7 @@ public class ArrayUtils {
      * @param array1  The first array whose elements are added to the new array.
      * @param array2  The second array whose elements are added to the new array.
      * @return The new char[] array or {@code null}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 2.1
      */
     public static char[] addAll(final char[] array1, final char... array2) {
@@ -942,7 +945,7 @@ public class ArrayUtils {
         if (array2 == null) {
             return clone(array1);
         }
-        final char[] joinedArray = new char[array1.length + array2.length];
+        final char[] joinedArray = new char[addExact(array1.length, array2)];
         System.arraycopy(array1, 0, joinedArray, 0, array1.length);
         System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
         return joinedArray;
@@ -965,6 +968,7 @@ public class ArrayUtils {
      * @param array1  The first array whose elements are added to the new array.
      * @param array2  The second array whose elements are added to the new array.
      * @return The new double[] array or {@code null}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 2.1
      */
     public static double[] addAll(final double[] array1, final double... array2) {
@@ -974,7 +978,7 @@ public class ArrayUtils {
         if (array2 == null) {
             return clone(array1);
         }
-        final double[] joinedArray = new double[array1.length + array2.length];
+        final double[] joinedArray = new double[addExact(array1.length, array2)];
         System.arraycopy(array1, 0, joinedArray, 0, array1.length);
         System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
         return joinedArray;
@@ -997,6 +1001,7 @@ public class ArrayUtils {
      * @param array1  The first array whose elements are added to the new array.
      * @param array2  The second array whose elements are added to the new array.
      * @return The new float[] array or {@code null}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 2.1
      */
     public static float[] addAll(final float[] array1, final float... array2) {
@@ -1006,7 +1011,7 @@ public class ArrayUtils {
         if (array2 == null) {
             return clone(array1);
         }
-        final float[] joinedArray = new float[array1.length + array2.length];
+        final float[] joinedArray = new float[addExact(array1.length, array2)];
         System.arraycopy(array1, 0, joinedArray, 0, array1.length);
         System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
         return joinedArray;
@@ -1029,6 +1034,7 @@ public class ArrayUtils {
      * @param array1  The first array whose elements are added to the new array.
      * @param array2  The second array whose elements are added to the new array.
      * @return The new int[] array or {@code null}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 2.1
      */
     public static int[] addAll(final int[] array1, final int... array2) {
@@ -1038,7 +1044,7 @@ public class ArrayUtils {
         if (array2 == null) {
             return clone(array1);
         }
-        final int[] joinedArray = new int[array1.length + array2.length];
+        final int[] joinedArray = new int[addExact(array1.length, array2)];
         System.arraycopy(array1, 0, joinedArray, 0, array1.length);
         System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
         return joinedArray;
@@ -1061,6 +1067,7 @@ public class ArrayUtils {
      * @param array1  The first array whose elements are added to the new array.
      * @param array2  The second array whose elements are added to the new array.
      * @return The new long[] array or {@code null}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 2.1
      */
     public static long[] addAll(final long[] array1, final long... array2) {
@@ -1070,7 +1077,7 @@ public class ArrayUtils {
         if (array2 == null) {
             return clone(array1);
         }
-        final long[] joinedArray = new long[array1.length + array2.length];
+        final long[] joinedArray = new long[addExact(array1.length, array2)];
         System.arraycopy(array1, 0, joinedArray, 0, array1.length);
         System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
         return joinedArray;
@@ -1093,6 +1100,7 @@ public class ArrayUtils {
      * @param array1  The first array whose elements are added to the new array.
      * @param array2  The second array whose elements are added to the new array.
      * @return The new short[] array or {@code null}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 2.1
      */
     public static short[] addAll(final short[] array1, final short... array2) {
@@ -1102,7 +1110,7 @@ public class ArrayUtils {
         if (array2 == null) {
             return clone(array1);
         }
-        final short[] joinedArray = new short[array1.length + array2.length];
+        final short[] joinedArray = new short[addExact(array1.length, array2)];
         System.arraycopy(array1, 0, joinedArray, 0, array1.length);
         System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
         return joinedArray;
@@ -1131,7 +1139,7 @@ public class ArrayUtils {
      * @return The new array, {@code null} if both arrays are {@code null}.
      *      The type of the new array is the type of the first array,
      *      unless the first array is null, in which case the type is the same as the second array.
-     * @throws IllegalArgumentException if the array types are incompatible.
+     * @throws IllegalArgumentException if the array types are incompatible or if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 2.1
      */
     public static <T> T[] addAll(final T[] array1, @SuppressWarnings("unchecked") final T... array2) {
@@ -1142,7 +1150,7 @@ public class ArrayUtils {
             return clone(array1);
         }
         final Class<T> type1 = getComponentType(array1);
-        final T[] joinedArray = arraycopy(array1, 0, 0, array1.length, () -> newInstance(type1, array1.length + array2.length));
+        final T[] joinedArray = arraycopy(array1, 0, 0, array1.length, () -> newInstance(type1, addExact(array1.length, array2)));
         try {
             System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
         } catch (final ArrayStoreException ase) {
@@ -3125,6 +3133,7 @@ public class ArrayUtils {
      * @param values The new values to insert, may be {@code null}.
      * @return The new array or {@code null} if the given array is {@code null}.
      * @throws IndexOutOfBoundsException if {@code array} is provided and either {@code index < 0} or {@code index > array.length}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 3.6
      */
     public static boolean[] insert(final int index, final boolean[] array, final boolean... values) {
@@ -3137,7 +3146,7 @@ public class ArrayUtils {
         if (index < 0 || index > array.length) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
         }
-        final boolean[] result = new boolean[array.length + values.length];
+        final boolean[] result = new boolean[addExact(array.length, values)];
         System.arraycopy(values, 0, result, index, values.length);
         if (index > 0) {
             System.arraycopy(array, 0, result, 0, index);
@@ -3166,6 +3175,7 @@ public class ArrayUtils {
      * @param values The new values to insert, may be {@code null}.
      * @return The new array or {@code null} if the given array is {@code null}.
      * @throws IndexOutOfBoundsException if {@code array} is provided and either {@code index < 0} or {@code index > array.length}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 3.6
      */
     public static byte[] insert(final int index, final byte[] array, final byte... values) {
@@ -3178,7 +3188,7 @@ public class ArrayUtils {
         if (index < 0 || index > array.length) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
         }
-        final byte[] result = new byte[array.length + values.length];
+        final byte[] result = new byte[addExact(array.length, values)];
         System.arraycopy(values, 0, result, index, values.length);
         if (index > 0) {
             System.arraycopy(array, 0, result, 0, index);
@@ -3207,6 +3217,7 @@ public class ArrayUtils {
      * @param values The new values to insert, may be {@code null}.
      * @return The new array or {@code null} if the given array is {@code null}.
      * @throws IndexOutOfBoundsException if {@code array} is provided and either {@code index < 0} or {@code index > array.length}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 3.6
      */
     public static char[] insert(final int index, final char[] array, final char... values) {
@@ -3219,7 +3230,7 @@ public class ArrayUtils {
         if (index < 0 || index > array.length) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
         }
-        final char[] result = new char[array.length + values.length];
+        final char[] result = new char[addExact(array.length, values)];
         System.arraycopy(values, 0, result, index, values.length);
         if (index > 0) {
             System.arraycopy(array, 0, result, 0, index);
@@ -3248,6 +3259,7 @@ public class ArrayUtils {
      * @param values The new values to insert, may be {@code null}.
      * @return The new array or {@code null} if the given array is {@code null}.
      * @throws IndexOutOfBoundsException if {@code array} is provided and either {@code index < 0} or {@code index > array.length}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 3.6
      */
     public static double[] insert(final int index, final double[] array, final double... values) {
@@ -3260,7 +3272,7 @@ public class ArrayUtils {
         if (index < 0 || index > array.length) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
         }
-        final double[] result = new double[array.length + values.length];
+        final double[] result = new double[addExact(array.length, values)];
         System.arraycopy(values, 0, result, index, values.length);
         if (index > 0) {
             System.arraycopy(array, 0, result, 0, index);
@@ -3289,6 +3301,7 @@ public class ArrayUtils {
      * @param values The new values to insert, may be {@code null}.
      * @return The new array or {@code null} if the given array is {@code null}.
      * @throws IndexOutOfBoundsException if {@code array} is provided and either {@code index < 0} or {@code index > array.length}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 3.6
      */
     public static float[] insert(final int index, final float[] array, final float... values) {
@@ -3301,7 +3314,7 @@ public class ArrayUtils {
         if (index < 0 || index > array.length) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
         }
-        final float[] result = new float[array.length + values.length];
+        final float[] result = new float[addExact(array.length, values)];
         System.arraycopy(values, 0, result, index, values.length);
         if (index > 0) {
             System.arraycopy(array, 0, result, 0, index);
@@ -3330,6 +3343,7 @@ public class ArrayUtils {
      * @param values The new values to insert, may be {@code null}.
      * @return The new array or {@code null} if the given array is {@code null}.
      * @throws IndexOutOfBoundsException if {@code array} is provided and either {@code index < 0} or {@code index > array.length}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 3.6
      */
     public static int[] insert(final int index, final int[] array, final int... values) {
@@ -3342,7 +3356,7 @@ public class ArrayUtils {
         if (index < 0 || index > array.length) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
         }
-        final int[] result = new int[array.length + values.length];
+        final int[] result = new int[addExact(array.length, values)];
         System.arraycopy(values, 0, result, index, values.length);
         if (index > 0) {
             System.arraycopy(array, 0, result, 0, index);
@@ -3371,6 +3385,7 @@ public class ArrayUtils {
      * @param values The new values to insert, may be {@code null}.
      * @return The new array or {@code null} if the given array is {@code null}.
      * @throws IndexOutOfBoundsException if {@code array} is provided and either {@code index < 0} or {@code index > array.length}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 3.6
      */
     public static long[] insert(final int index, final long[] array, final long... values) {
@@ -3383,7 +3398,7 @@ public class ArrayUtils {
         if (index < 0 || index > array.length) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
         }
-        final long[] result = new long[array.length + values.length];
+        final long[] result = new long[addExact(array.length, values)];
         System.arraycopy(values, 0, result, index, values.length);
         if (index > 0) {
             System.arraycopy(array, 0, result, 0, index);
@@ -3412,6 +3427,7 @@ public class ArrayUtils {
      * @param values The new values to insert, may be {@code null}.
      * @return The new array or {@code null} if the given array is {@code null}.
      * @throws IndexOutOfBoundsException if {@code array} is provided and either {@code index < 0} or {@code index > array.length}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 3.6
      */
     public static short[] insert(final int index, final short[] array, final short... values) {
@@ -3424,7 +3440,7 @@ public class ArrayUtils {
         if (index < 0 || index > array.length) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
         }
-        final short[] result = new short[array.length + values.length];
+        final short[] result = new short[addExact(array.length, values)];
         System.arraycopy(values, 0, result, index, values.length);
         if (index > 0) {
             System.arraycopy(array, 0, result, 0, index);
@@ -3454,6 +3470,7 @@ public class ArrayUtils {
      * @param values The new values to insert, may be {@code null}.
      * @return The new array or {@code null} if the given array is {@code null}.
      * @throws IndexOutOfBoundsException if {@code array} is provided and either {@code index < 0} or {@code index > array.length}.
+     * @throws IllegalArgumentException if the total array length exceeds {@link ArrayUtils#SAFE_MAX_ARRAY_LENGTH}.
      * @since 3.6
      */
     @SafeVarargs
@@ -3475,7 +3492,7 @@ public class ArrayUtils {
             throw new IndexOutOfBoundsException("Index: " + index + ", Length: " + array.length);
         }
         final Class<T> type = getComponentType(array);
-        final int length = array.length + values.length;
+        final int length = addExact(array.length, values);
         final T[] result = newInstance(type, length);
         System.arraycopy(values, 0, result, index, values.length);
         if (index > 0) {

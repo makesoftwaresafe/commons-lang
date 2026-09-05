@@ -272,6 +272,7 @@ java.lang.NullPointerException: Cannot invoke
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">ClassUtils.getClass() name normalization (whitespace stripping + dot-to-dollar rewriting) defeats host-side class-name string checks (f020).</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">Fraction.getFraction(String) throws undeclared ArithmeticException on crafted numeric strings ('9999999999.5', '1/0', mixed-number overflow) (f021).</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">StringEscapeUtils.escapeHtml4/3 apostrophe gap: single-quoted and unquoted HTML attribute contexts are trivially breakable, and the javadoc discloses the gap only as an HTML4 entity-legality footnote (f022).</action>
+    <action                   type="fix" dev="ggregory" due-to="Gary Gregory">ArrayUtils.addAll/insert length arithmetic overflows (undeclared NegativeArraySizeException) while sibling concat is overflow-checked (f023).</action>
     <!-- ADD -->
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add JavaVersion.JAVA_27.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add SystemUtils.IS_JAVA_27.</action>
