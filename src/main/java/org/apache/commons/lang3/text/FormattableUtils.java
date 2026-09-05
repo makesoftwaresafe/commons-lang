@@ -101,8 +101,9 @@ public class FormattableUtils {
             buf.replace(precision - actualEllipsis.length(), seq.length(), actualEllipsis.toString());
         }
         final boolean leftJustify = (flags & FormattableFlags.LEFT_JUSTIFY) == FormattableFlags.LEFT_JUSTIFY;
-        for (int i = buf.length(); i < width; i++) {
-            buf.insert(leftJustify ? i : 0, padChar);
+        if (width > buf.length()) {
+            final String padding = StringUtils.repeat(padChar, width - buf.length());
+            buf.insert(leftJustify ? buf.length() : 0, padding);
         }
         return formatter.format(SIMPLEST_FORMAT, buf.toString());
     }
