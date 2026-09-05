@@ -63,6 +63,11 @@ public class CharSequenceUtils {
 
     /**
      * Used by the indexOf(CharSequence methods) as a green implementation of indexOf.
+     * <p>
+     * {@link CharSequence} types without a dedicated branch are scanned in place rather than materialized with {@code toString()}: for builder
+     * types (for example {@code org.apache.commons.lang3.text.StrBuilder}), {@code toString()} copies the whole buffer, and callers that invoke
+     * this method once per occurrence (such as {@code deleteAll}/{@code replaceAll}) would multiply that copy into allocation-quadratic churn.
+     * </p>
      *
      * @param cs         The {@link CharSequence} to be processed.
      * @param searchChar The {@link CharSequence} to be searched for.
@@ -82,16 +87,24 @@ public class CharSequenceUtils {
         if (cs instanceof StringBuffer) {
             return ((StringBuffer) cs).indexOf(searchChar.toString(), start);
         }
-        return cs.toString().indexOf(searchChar.toString(), start);
-//        if (cs instanceof String && searchChar instanceof String) {
-//            // TODO: Do we assume searchChar is usually relatively small;
-//            //       If so then calling toString() on it is better than reverting to
-//            //       the green implementation in the else block
-//            return ((String) cs).indexOf((String) searchChar, start);
-//        } else {
-//            // TODO: Implement rather than convert to String
-//            return cs.toString().indexOf(searchChar.toString(), start);
-//        }
+        // Direct scan without copying cs; matches the semantics of String.indexOf(String, int).
+        final int len1 = cs.length();
+        final int len2 = searchChar.length();
+        final int from = Math.max(start, 0);
+        if (len2 == 0) {
+            return Math.min(from, len1);
+        }
+        if (len2 > len1 - from) {
+            return StringUtils.INDEX_NOT_FOUND;
+        }
+        final char char0 = searchChar.charAt(0);
+        final int max = len1 - len2;
+        for (int i = from; i <= max; i++) {
+            if (cs.charAt(i) == char0 && checkLaterThan1(cs, searchChar, len2, i)) {
+                return i;
+            }
+        }
+        return StringUtils.INDEX_NOT_FOUND;
     }
 
     /**
