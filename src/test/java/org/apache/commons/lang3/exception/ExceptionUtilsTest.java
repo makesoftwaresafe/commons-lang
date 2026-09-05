@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,6 +36,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -389,6 +391,95 @@ class ExceptionUtilsTest extends AbstractLangTest {
             }
         }
         assertFalse(match);
+    }
+
+    /**
+     * Tests that ordinary message lines whose first non-whitespace characters happen to be "at" are no longer mistaken for stack
+     * frames, so a multi-line untrusted message can neither inject a non-frame-shaped line into the frame list nor suppress the
+     * real frames that follow it.
+     */
+    @Test
+    void testGetRootCauseStackTraceMessageLinesNotMistakenForFrames() {
+        final Throwable t = new IllegalArgumentException(
+                "denied" + System.lineSeparator() + " attack detected" + System.lineSeparator() + "at your request, more text");
+        final String[] stackTrace = ExceptionUtils.getRootCauseStackTrace(t);
+        // No fabricated entries: every frame line after the header parses as "at <ref>(...".
+        boolean sawRealFrame = false;
+        for (int i = 1; i < stackTrace.length; i++) {
+            final String element = stackTrace[i];
+            if (element.contains("attack detected") || element.contains("at your request")) {
+                fail("message text classified as a stack frame: " + element);
+            }
+            if (element.contains(getClass().getSimpleName())) {
+                sawRealFrame = true;
+            }
+        }
+        // The real frames survive: this test method must be present in the parsed trace.
+        assertTrue(sawRealFrame, "real frames were suppressed");
+    }
+
+    /**
+     * Tests that every frame shape {@code StackTraceElement.toString()} can emit is accepted by the tightened frame matcher,
+     * in particular JDK 9+ module-versioned frames ({@code mod@version/pkg.Class}), which a character whitelist without
+     * {@code '@'} would reject — silently dropping that frame and every real frame below it. Uses a throwable that prints a
+     * fixed trace so the shapes are deterministic without constructing module-versioned {@link StackTraceElement}s.
+     */
+    @Test
+    void testGetStackFrameListAcceptsAllRealFrameShapes() {
+        final String[] frames = {
+            "\tat com.example.Foo.bar(Foo.java:42)",                                            // classic
+            "\tat app//com.foo.Main.main(Main.java:10)",                                        // class loader prefix
+            "\tat com.foo.mod@1.0.3/com.foo.Helper.help(Helper.java:7)",                        // module name @ version
+            "\tat java.base/java.lang.Thread.run(Thread.java:833)",                             // module, no version
+            "\tat com.foo.Main$$Lambda$17/0x0000000800c02a48.run(Unknown Source)",              // lambda / hidden class
+            "\tat com.example.Foo.<init>(Foo.java:5)",                                          // constructor
+            "\tat java.base/java.lang.Object.wait(Native Method)"                               // native
+        };
+        final StringBuilder text = new StringBuilder("java.lang.RuntimeException: boom").append(System.lineSeparator());
+        for (final String frame : frames) {
+            text.append(frame).append(System.lineSeparator());
+        }
+        final Throwable fixed = new RuntimeException("boom") {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void printStackTrace(final PrintWriter writer) {
+                writer.print(text);
+            }
+        };
+        final List<String> list = ExceptionUtils.getStackFrameList(fixed);
+        assertEquals(Arrays.asList(frames), list, "a legitimate frame shape was rejected (and frames below it dropped)");
+    }
+
+    /**
+     * Tests that message text is still rejected by the frame matcher: forged lines lacking the no-whitespace-before-'('
+     * frame syntax must not start or extend the frame list.
+     */
+    @Test
+    void testGetStackFrameListRejectsForgedMessageLines() {
+        final String[] forged = {
+            " attack detected",                              // "at" not followed by space-delimited reference
+            "at your request, more text",                    // no leading whitespace
+            "\tat your request, more text",                  // no '(' at all
+            "\tat forged frame entry(Evil.java:1)",          // whitespace between "at " and '('
+            "\tat (Evil.java:1)"                             // empty reference
+        };
+        final StringBuilder text = new StringBuilder("java.lang.RuntimeException: boom").append(System.lineSeparator());
+        for (final String line : forged) {
+            text.append(line).append(System.lineSeparator());
+        }
+        text.append("\tat com.example.Foo.bar(Foo.java:42)").append(System.lineSeparator());
+        final Throwable fixed = new RuntimeException("boom") {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void printStackTrace(final PrintWriter writer) {
+                writer.print(text);
+            }
+        };
+        final List<String> list = ExceptionUtils.getStackFrameList(fixed);
+        assertEquals(Arrays.asList("\tat com.example.Foo.bar(Foo.java:42)"), list,
+                "forged message text was classified as a stack frame");
     }
 
     @Test

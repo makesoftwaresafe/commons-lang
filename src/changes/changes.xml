@@ -274,6 +274,7 @@ java.lang.NullPointerException: Cannot invoke
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">StringEscapeUtils.escapeHtml4/3 apostrophe gap: single-quoted and unquoted HTML attribute contexts are trivially breakable, and the javadoc discloses the gap only as an HTML4 entity-legality footnote (f022).</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">ArrayUtils.addAll/insert length arithmetic overflows (undeclared NegativeArraySizeException) while sibling concat is overflow-checked (f023).</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">FormattableUtils.append pads right-justified output with insert(0) per char; O(width^2); '%500000s' costs ~1.25e11 char moves (f024).</action>
+    <action                   type="fix" dev="ggregory" due-to="Gary Gregory">Attacker-controlled exception message forges frames in getRootCauseStackTrace output AND suppresses all real frames, beyond cosmetic log spoofing (f025).</action>
     <!-- ADD -->
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add JavaVersion.JAVA_27.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add SystemUtils.IS_JAVA_27.</action>
