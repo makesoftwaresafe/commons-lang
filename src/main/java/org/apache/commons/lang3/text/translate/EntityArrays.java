@@ -330,6 +330,7 @@ public class EntityArrays {
     private static final String[][] HTML40_EXTENDED_UNESCAPE = invert(HTML40_EXTENDED_ESCAPE);
 
     private static final String[][] BASIC_ESCAPE = {
+        {"'", "&#39;"},   // ' - apostrophe
         {"\"", "&quot;"}, // " - double-quote
         {"&", "&amp;"},   // & - ampersand
         {"<", "&lt;"},    // < - less-than
@@ -375,7 +376,9 @@ public class EntityArrays {
     /**
      * Mapping to escape the basic XML and HTML character entities.
      *
-     * Namely: {@code " & < >}
+     * <p>
+     * Namely: {@code " ' & < >}. The apostrophe is escaped as the numeric reference {@code &#39;}.
+     * </p>
      *
      * @return The mapping table.
      */

@@ -53,7 +53,7 @@ class StringEscapeUtilsTest extends AbstractLangTest {
         {"quotes", "&quot;bread&quot; &amp; butter", "\"bread\" & butter"},
         {"final character only", "greater than &gt;", "greater than >"},
         {"first character only", "&lt; less than", "< less than"},
-        {"apostrophe", "Huntington's chorea", "Huntington's chorea"},
+        {"apostrophe", "Huntington&#39;s chorea", "Huntington's chorea"},
         {"languages", "English,Fran&ccedil;ais,\u65E5\u672C\u8A9E (nihongo)", "English,Fran\u00E7ais,\u65E5\u672C\u8A9E (nihongo)"},
         {"8-bit ascii shouldn't number-escape", "\u0080\u009F", "\u0080\u009F"},
     };
@@ -214,6 +214,24 @@ class StringEscapeUtilsTest extends AbstractLangTest {
             final String actual = original == null ? null : sw.toString();
             assertEquals(expected, actual, message);
         }
+    }
+
+    @Test
+    void testEscapeHtmlApostrophes() throws IOException {
+        final String input = "' autofocus onfocus=alert(1) x='";
+        final String expected = "&#39; autofocus onfocus=alert(1) x=&#39;";
+        assertEquals(expected, StringEscapeUtils.escapeHtml3(input));
+        assertEquals(expected, StringEscapeUtils.escapeHtml4(input));
+        for (final CharSequenceTranslator translator : new CharSequenceTranslator[] {
+                StringEscapeUtils.ESCAPE_HTML3, StringEscapeUtils.ESCAPE_HTML4 }) {
+            final StringWriter writer = new StringWriter();
+            translator.translate(input, writer);
+            assertEquals(expected, writer.toString());
+            assertEquals("&#39;&#39;", translator.translate("''"));
+            assertEquals("&amp;#39;", translator.translate("&#39;"));
+        }
+        assertEquals(input, StringEscapeUtils.unescapeHtml3(expected));
+        assertEquals(input, StringEscapeUtils.unescapeHtml4(expected));
     }
 
     /**

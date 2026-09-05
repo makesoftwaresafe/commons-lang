@@ -175,8 +175,8 @@ public class StringEscapeUtils {
     @Deprecated
     public static final CharSequenceTranslator ESCAPE_XML =
         new AggregateTranslator(
-            new LookupTranslator(EntityArrays.BASIC_ESCAPE()),
-            new LookupTranslator(EntityArrays.APOS_ESCAPE())
+            new LookupTranslator(EntityArrays.APOS_ESCAPE()),
+            new LookupTranslator(EntityArrays.BASIC_ESCAPE())
         );
 
     /**
@@ -190,8 +190,8 @@ public class StringEscapeUtils {
      */
     public static final CharSequenceTranslator ESCAPE_XML10 =
         new AggregateTranslator(
-            new LookupTranslator(EntityArrays.BASIC_ESCAPE()),
             new LookupTranslator(EntityArrays.APOS_ESCAPE()),
+            new LookupTranslator(EntityArrays.BASIC_ESCAPE()),
             new LookupTranslator(
                     new String[][] {
                             { "\u0000", StringUtils.EMPTY },
@@ -242,8 +242,8 @@ public class StringEscapeUtils {
      */
     public static final CharSequenceTranslator ESCAPE_XML11 =
         new AggregateTranslator(
-            new LookupTranslator(EntityArrays.BASIC_ESCAPE()),
             new LookupTranslator(EntityArrays.APOS_ESCAPE()),
+            new LookupTranslator(EntityArrays.BASIC_ESCAPE()),
             new LookupTranslator(
                     new String[][] {
                             { "\u0000", StringUtils.EMPTY },
@@ -476,7 +476,13 @@ public class StringEscapeUtils {
 
     /**
      * Escapes the characters in a {@link String} using HTML entities.
-     * <p>Supports only the HTML 3.0 entities.</p>
+     *
+     * <p>
+     * Supports only the HTML 3.0 entities. Apostrophes are escaped as the numeric reference {@code &#39;}.
+     * </p>
+     * <p>
+     * HTML attribute values must be quoted. This method does not escape all characters that delimit unquoted attribute values.
+     * </p>
      *
      * @param input  The {@link String} to escape, may be null
      * @return A new escaped {@link String}, {@code null} if null string input
@@ -497,10 +503,13 @@ public class StringEscapeUtils {
      * <p>
      * {@code &amp;quot;bread&amp;quot; &amp;amp; &amp;quot;butter&amp;quot;}.
      * </p>
-     *
-     * <p>Supports all known HTML 4.0 entities, including funky accents.
-     * Note that the commonly used apostrophe escape character (&amp;apos;)
-     * is not a legal entity and so is not supported).</p>
+     * <p>
+     * Supports all known HTML 4.0 entities, including funky accents.
+     * Apostrophes are escaped as the numeric reference {@code &#39;} because {@code &apos;} is not a legal HTML 4.0 entity.
+     * </p>
+     * <p>
+     * HTML attribute values must be quoted. This method does not escape all characters that delimit unquoted attribute values.
+     * </p>
      *
      * @param input  The {@link String} to escape, may be null
      * @return A new escaped {@link String}, {@code null} if null string input
