@@ -362,8 +362,7 @@ public class LockingVisitors {
          * @param function The function, which is being invoked to compute the result. The function will receive the
          *        hidden object.
          * @return The result object, which has been returned by the functions invocation.
-         * @throws IllegalStateException The result object would be, in fact, the hidden object. This would extend
-         *         access to the hidden object beyond this methods lifetime and will therefore be prevented.
+         * @throws NullPointerException Thrown if the lock supplier is null or returns null.
          * @see #acceptReadLocked(FailableConsumer)
          * @see #applyWriteLocked(FailableFunction)
          */
@@ -389,8 +388,7 @@ public class LockingVisitors {
          * @param function The function, which is being invoked to compute the result. The function will receive the
          *        hidden object.
          * @return The result object, which has been returned by the functions invocation.
-         * @throws IllegalStateException The result object would be, in fact, the hidden object. This would extend
-         *         access to the hidden object beyond this methods lifetime and will therefore be prevented.
+         * @throws NullPointerException Thrown if the lock supplier is null or returns null.
          * @see #acceptReadLocked(FailableConsumer)
          * @see #applyWriteLocked(FailableFunction)
          */
@@ -447,8 +445,7 @@ public class LockingVisitors {
          * @param function The function, which is being invoked to compute the result object. This function will receive
          *        The object to protect as a parameter.
          * @return The result object, which has been returned by the functions invocation.
-         * @throws IllegalStateException The result object would be, in fact, the hidden object. This would extend
-         *         access to the hidden object beyond this methods lifetime and will therefore be prevented.
+         * @throws NullPointerException Thrown if the lock supplier is null or returns null.
          * @see #applyReadLocked(FailableFunction)
          * @see #applyWriteLocked(FailableFunction)
          */
