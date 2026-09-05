@@ -609,6 +609,26 @@ class FractionTest extends AbstractLangTest {
         assertThrows(NumberFormatException.class, () -> Fraction.getFraction(" "));
     }
 
+    /**
+     * Tests that string contents that are well-formed but unrepresentable throw the documented NumberFormatException
+     * (with the ArithmeticException preserved as the cause) instead of an undeclared ArithmeticException.
+     */
+    @Test
+    void testFactory_String_unrepresentableThrowsNumberFormatException() {
+        // double delegation path: out of int range and non-convergent values
+        NumberFormatException e = assertThrows(NumberFormatException.class, () -> Fraction.getFraction("9999999999.5"));
+        assertTrue(e.getCause() instanceof ArithmeticException);
+        assertThrows(NumberFormatException.class, () -> Fraction.getFraction("2147483648.5"));
+        // Y/Z path: zero denominator and negation overflow
+        e = assertThrows(NumberFormatException.class, () -> Fraction.getFraction("1/0"));
+        assertTrue(e.getCause() instanceof ArithmeticException);
+        assertThrows(NumberFormatException.class, () -> Fraction.getFraction("1/-2147483648"));
+        // X Y/Z path: zero denominator and combined-numerator overflow
+        e = assertThrows(NumberFormatException.class, () -> Fraction.getFraction("1 2/0"));
+        assertTrue(e.getCause() instanceof ArithmeticException);
+        assertThrows(NumberFormatException.class, () -> Fraction.getFraction("2147483647 1/2"));
+    }
+
     @Test
     void testGets() {
         Fraction f;

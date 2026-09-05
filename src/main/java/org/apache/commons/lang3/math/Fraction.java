@@ -245,39 +245,51 @@ public final class Fraction extends Number implements Comparable<Fraction> {
      * </p>
      * <ol>
      * <li>{@code double} String containing a dot</li>
-     * <li>'X Y/Z'</li>
-     * <li>'Y/Z'</li>
-     * <li>'X' (a simple whole number)</li>
+     * <li>{@code "X Y/Z"}</li>
+     * <li>{@code "Y/Z"}</li>
+     * <li>{@code "X"} (a simple whole number)</li>
      * </ol>
      * <p>
-     * and a .
+     * and a {@code .}
      * </p>
      *
      * @param str The string to parse, must not be {@code null}
      * @return The new {@link Fraction} instance
-     * @throws NullPointerException  if the string is {@code null}
-     * @throws NumberFormatException if the number format is invalid
+     * @throws NullPointerException  Thrown if the string is {@code null}
+     * @throws NumberFormatException Thrown if the number format is invalid, or if the string is well-formed but its value cannot be represented as a
+     *                               {@code Fraction}: a zero denominator such as {@code "1/0"}, a value outside the range of an {@code int} such as
+     *                               {@code "9999999999.5"}, or a mixed number whose combined numerator overflows. For those unrepresentable values, the causal
+     *                               {@link ArithmeticException} is preserved as the {@link Throwable#getCause() cause}.
      */
-    public static Fraction getFraction(String str) {
+    public static Fraction getFraction(final String str) {
         Objects.requireNonNull(str, "str");
         // parse double format
         int pos = str.indexOf('.');
         if (pos >= 0) {
-            return getFraction(Double.parseDouble(str));
+            final double value = Double.parseDouble(str);
+            try {
+                return getFraction(value);
+            } catch (final ArithmeticException e) {
+                throw toNumberFormatException(str, e);
+            }
         }
 
         // parse X Y/Z format
         pos = str.indexOf(' ');
         if (pos > 0) {
             final int whole = Integer.parseInt(str.substring(0, pos));
-            str = str.substring(pos + 1);
-            pos = str.indexOf('/');
+            final String remainder = str.substring(pos + 1);
+            pos = remainder.indexOf('/');
             if (pos < 0) {
                 throw new NumberFormatException("The fraction could not be parsed as the format X Y/Z");
             }
-            final int numer = Integer.parseInt(str.substring(0, pos));
-            final int denom = Integer.parseInt(str.substring(pos + 1));
-            return getFraction(whole, numer, denom);
+            final int numer = Integer.parseInt(remainder.substring(0, pos));
+            final int denom = Integer.parseInt(remainder.substring(pos + 1));
+            try {
+                return getFraction(whole, numer, denom);
+            } catch (final ArithmeticException e) {
+                throw toNumberFormatException(str, e);
+            }
         }
 
         // parse Y/Z format
@@ -288,7 +300,11 @@ public final class Fraction extends Number implements Comparable<Fraction> {
         }
         final int numer = Integer.parseInt(str.substring(0, pos));
         final int denom = Integer.parseInt(str.substring(pos + 1));
-        return getFraction(numer, denom);
+        try {
+            return getFraction(numer, denom);
+        } catch (final ArithmeticException e) {
+            throw toNumberFormatException(str, e);
+        }
     }
 
     /**
@@ -434,6 +450,20 @@ public final class Fraction extends Number implements Comparable<Fraction> {
             throw new ArithmeticException("overflow: mulPos");
         }
         return (int) m;
+    }
+
+    /**
+     * Converts an {@link ArithmeticException} raised while parsing a string into the {@link NumberFormatException} that
+     * {@link #getFraction(String)} documents, preserving the original exception as the cause.
+     *
+     * @param str The string being parsed.
+     * @param cause The arithmetic failure: a zero denominator or a value outside the range of an {@code int}.
+     * @return The exception for the caller to throw, never {@code null}.
+     */
+    private static NumberFormatException toNumberFormatException(final String str, final ArithmeticException cause) {
+        final NumberFormatException nfe = new NumberFormatException("The fraction could not be parsed from '" + str + "': " + cause.getMessage());
+        nfe.initCause(cause);
+        return nfe;
     }
 
     /**
