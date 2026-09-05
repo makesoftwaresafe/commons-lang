@@ -552,6 +552,14 @@ public class ClassUtils {
      * The provided class name is normalized by removing all whitespace. This is especially helpful when handling XML element values in which whitespace has not
      * been collapsed.
      * </p>
+     * <p>
+     * <strong>Security note:</strong> because all whitespace is deleted before the class is resolved (and a failing {@code '.'} may be retried as {@code '$'}
+     * for inner classes), many distinct input strings resolve to the same class, while {@link Class#forName(String)} performs no such normalization. Validating
+     * an untrusted class name by string comparison <em>before</em> calling this method is therefore unsound: for example, {@code " java.lang.Runtime"} fails a
+     * naive {@code startsWith("java.")} denylist check on the raw string, yet loads {@code java.lang.Runtime}. Validate the class name <em>after</em>
+     * normalization, validate the resolved {@link Class} object itself, or use {@link #getClassStrict(ClassLoader, String, boolean)} which performs no
+     * whitespace normalization.
+     * </p>
      *
      * @param classLoader The class loader to use to load the class.
      * @param className The class name.
@@ -577,6 +585,14 @@ public class ClassUtils {
      * The provided class name is normalized by removing all whitespace. This is especially helpful when handling XML element values in which whitespace has not
      * been collapsed.
      * </p>
+     * <p>
+     * <strong>Security note:</strong> because all whitespace is deleted before the class is resolved (and a failing {@code '.'} may be retried as {@code '$'}
+     * for inner classes), many distinct input strings resolve to the same class, while {@link Class#forName(String)} performs no such normalization. Validating
+     * an untrusted class name by string comparison <em>before</em> calling this method is therefore unsound: for example, {@code " java.lang.Runtime"} fails a
+     * naive {@code startsWith("java.")} denylist check on the raw string, yet loads {@code java.lang.Runtime}. Validate the class name <em>after</em>
+     * normalization, validate the resolved {@link Class} object itself, or use {@link #getClassStrict(ClassLoader, String, boolean)} which performs no
+     * whitespace normalization.
+     * </p>
      *
      * @param classLoader The class loader to use to load the class.
      * @param className The class name.
@@ -592,13 +608,29 @@ public class ClassUtils {
      * @see <a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-13.html#jls-13.1">JLS: The Form of a Binary</a>
      */
     public static Class<?> getClass(final ClassLoader classLoader, final String className, final boolean initialize) throws ClassNotFoundException {
+        return getClass(classLoader, className, initialize, true);
+    }
+
+    /**
+     * Implements {@link #getClass(ClassLoader, String, boolean)} and {@link #getClassStrict(ClassLoader, String, boolean)}.
+     *
+     * @param classLoader The class loader to use to load the class.
+     * @param className The class name.
+     * @param initialize whether the class must be initialized.
+     * @param normalizeWhitespace whether to delete all whitespace from the class name before resolving it.
+     * @return The class represented by {@code className} using the {@code classLoader}.
+     * @throws NullPointerException if the className is null.
+     * @throws ClassNotFoundException if the class is not found.
+     */
+    private static Class<?> getClass(final ClassLoader classLoader, final String className, final boolean initialize, final boolean normalizeWhitespace)
+            throws ClassNotFoundException {
         // This method was re-written to avoid recursion and stack overflows found by fuzz testing.
         String next = className;
         int lastDotIndex = -1;
         do {
             try {
                 final Class<?> clazz = getPrimitiveClass(next);
-                return clazz != null ? clazz : Class.forName(toCleanName(next), initialize, classLoader);
+                return clazz != null ? clazz : Class.forName(normalizeWhitespace ? toCleanName(next) : toEncodedName(next), initialize, classLoader);
             } catch (final ClassNotFoundException ex) {
                 lastDotIndex = next.lastIndexOf(PACKAGE_SEPARATOR_CHAR);
                 if (lastDotIndex != -1) {
@@ -616,6 +648,14 @@ public class ClassUtils {
      * <p>
      * The provided class name is normalized by removing all whitespace. This is especially helpful when handling XML element values in which whitespace has not
      * been collapsed.
+     * </p>
+     * <p>
+     * <strong>Security note:</strong> because all whitespace is deleted before the class is resolved (and a failing {@code '.'} may be retried as {@code '$'}
+     * for inner classes), many distinct input strings resolve to the same class, while {@link Class#forName(String)} performs no such normalization. Validating
+     * an untrusted class name by string comparison <em>before</em> calling this method is therefore unsound: for example, {@code " java.lang.Runtime"} fails a
+     * naive {@code startsWith("java.")} denylist check on the raw string, yet loads {@code java.lang.Runtime}. Validate the class name <em>after</em>
+     * normalization, validate the resolved {@link Class} object itself, or use {@link #getClassStrict(ClassLoader, String, boolean)} which performs no
+     * whitespace normalization.
      * </p>
      *
      * @param className The class name
@@ -641,6 +681,14 @@ public class ClassUtils {
      * The provided class name is normalized by removing all whitespace. This is especially helpful when handling XML element values in which whitespace has not
      * been collapsed.
      * </p>
+     * <p>
+     * <strong>Security note:</strong> because all whitespace is deleted before the class is resolved (and a failing {@code '.'} may be retried as {@code '$'}
+     * for inner classes), many distinct input strings resolve to the same class, while {@link Class#forName(String)} performs no such normalization. Validating
+     * an untrusted class name by string comparison <em>before</em> calling this method is therefore unsound: for example, {@code " java.lang.Runtime"} fails a
+     * naive {@code startsWith("java.")} denylist check on the raw string, yet loads {@code java.lang.Runtime}. Validate the class name <em>after</em>
+     * normalization, validate the resolved {@link Class} object itself, or use {@link #getClassStrict(ClassLoader, String, boolean)} which performs no
+     * whitespace normalization.
+     * </p>
      *
      * @param className The class name.
      * @param initialize whether the class must be initialized.
@@ -658,6 +706,66 @@ public class ClassUtils {
         final ClassLoader contextCL = Thread.currentThread().getContextClassLoader();
         final ClassLoader loader = contextCL == null ? ClassUtils.class.getClassLoader() : contextCL;
         return getClass(loader, className, initialize);
+    }
+
+    /**
+     * Gets the class represented by {@code className} using the {@code classLoader}, without normalizing the class name.
+     * <p>
+     * Unlike {@link #getClass(ClassLoader, String, boolean)}, this method does <em>not</em> delete whitespace from the class name: a name that differs from
+     * the intended binary name only by whitespace throws {@link ClassNotFoundException}, matching {@link Class#forName(String, boolean, ClassLoader)}. Use
+     * this variant when the class name may come from an untrusted source, so that host-side string validation of the raw name cannot be bypassed through
+     * whitespace the loader would otherwise silently remove.
+     * </p>
+     * <p>
+     * The syntaxes "{@code java.util.Map.Entry[]}", "{@code java.util.Map$Entry[]}", "{@code [Ljava.util.Map.Entry;}", and "{@code [Ljava.util.Map$Entry;}"
+     * are still supported: a failing {@code '.'} is retried as {@code '$'} to find inner classes, so more than one dotted spelling can still resolve to the
+     * same inner class. When validating untrusted names, prefer validating the resolved {@link Class} object.
+     * </p>
+     *
+     * @param classLoader The class loader to use to load the class.
+     * @param className The class name.
+     * @param initialize whether the class must be initialized.
+     * @return The class represented by {@code className} using the {@code classLoader}.
+     * @throws NullPointerException if the className is null.
+     * @throws ClassNotFoundException if the class is not found.
+     * @throws IllegalArgumentException Thrown if the class name represents an array with more dimensions than the JVM supports, 255.
+     * @throws IllegalArgumentException Thrown if the class name length is greater than 65,535.
+     * @see Class#forName(String, boolean, ClassLoader)
+     * @see #getClass(ClassLoader, String, boolean)
+     * @since 3.21.0
+     */
+    public static Class<?> getClassStrict(final ClassLoader classLoader, final String className, final boolean initialize) throws ClassNotFoundException {
+        return getClass(classLoader, className, initialize, false);
+    }
+
+    /**
+     * Gets the (initialized) class represented by {@code className} using the current thread's context class loader, without normalizing the class name.
+     * <p>
+     * Unlike {@link #getClass(String)}, this method does <em>not</em> delete whitespace from the class name: a name that differs from the intended binary
+     * name only by whitespace throws {@link ClassNotFoundException}, matching {@link Class#forName(String)}. Use this variant when the class name may come
+     * from an untrusted source, so that host-side string validation of the raw name cannot be bypassed through whitespace the loader would otherwise silently
+     * remove.
+     * </p>
+     * <p>
+     * The syntaxes "{@code java.util.Map.Entry[]}", "{@code java.util.Map$Entry[]}", "{@code [Ljava.util.Map.Entry;}", and "{@code [Ljava.util.Map$Entry;}"
+     * are still supported: a failing {@code '.'} is retried as {@code '$'} to find inner classes, so more than one dotted spelling can still resolve to the
+     * same inner class. When validating untrusted names, prefer validating the resolved {@link Class} object.
+     * </p>
+     *
+     * @param className The class name.
+     * @return The class represented by {@code className} using the current thread's context class loader.
+     * @throws NullPointerException if the className is null.
+     * @throws ClassNotFoundException if the class is not found.
+     * @throws IllegalArgumentException Thrown if the class name represents an array with more dimensions than the JVM supports, 255.
+     * @throws IllegalArgumentException Thrown if the class name length is greater than 65,535.
+     * @see Class#forName(String)
+     * @see #getClass(String)
+     * @since 3.21.0
+     */
+    public static Class<?> getClassStrict(final String className) throws ClassNotFoundException {
+        final ClassLoader contextCL = Thread.currentThread().getContextClassLoader();
+        final ClassLoader loader = contextCL == null ? ClassUtils.class.getClassLoader() : contextCL;
+        return getClassStrict(loader, className, true);
     }
 
     /**
@@ -1616,7 +1724,20 @@ public class ClassUtils {
      * @see <a href="https://docs.oracle.com/javase/specs/jls/se25/html/jls-13.html#jls-13.1">JLS: The Form of a Binary</a>
      */
     private static String toCleanName(final String className) {
-        String canonicalName = StringUtils.deleteWhitespace(className);
+        return toEncodedName(StringUtils.deleteWhitespace(className));
+    }
+
+    /**
+     * Converts a class name to a JLS style class name without normalizing whitespace.
+     *
+     * @param className The class name.
+     * @return The converted name.
+     * @throws NullPointerException     if the className is null.
+     * @throws IllegalArgumentException Thrown if the class name represents an array with more dimensions than the JVM supports, 255.
+     * @throws IllegalArgumentException Thrown if the class name length is greater than 65,535.
+     */
+    private static String toEncodedName(final String className) {
+        String canonicalName = className;
         Objects.requireNonNull(canonicalName, "className");
         if (canonicalName.isEmpty()) {
             throw new IllegalArgumentException("Class name is empty");

@@ -269,6 +269,7 @@ java.lang.NullPointerException: Cannot invoke
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">Fix LockingVisitors Javadoc to match code (f017).</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">DoubleRange/Range accept NaN endpoints, silently producing a half-unbounded range, contains()/fit() fail open for every value above the minimum (f018).</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">BitField long-mask fields silently mis-answer int/short/byte accessors: shifts masked mod 32, and sign extension makes above-bit-31 flags read as set on any negative holder (f019).</action>
+    <action                   type="fix" dev="ggregory" due-to="Gary Gregory">ClassUtils.getClass() name normalization (whitespace stripping + dot-to-dollar rewriting) defeats host-side class-name string checks (f020).</action>
     <!-- ADD -->
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add JavaVersion.JAVA_27.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add SystemUtils.IS_JAVA_27.</action>
@@ -290,6 +291,8 @@ java.lang.NullPointerException: Cannot invoke
     <action issue="LANG-1833" type="add" dev="ggregory" due-to="Maksym Korshun">Handle ParsePosition index beyond source string length cleanly (#1757).</action>
     <action                   type="fix" dev="ggregory" due-to="alhudz, Gary Gregory">Fix StrBuilder.lastIndexOf(String) start index for an empty search (#1759).</action>
     <action                   type="fix" dev="ggregory" due-to="alhudz, Gary Gregory">Fix int overflow in Conversion count and position bounds guards (#1779).</action>
+    <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add ClassUtils.getClassStrict(ClassLoader, String, boolean) (f020).</action>
+    <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add ClassUtils.getClassStrict(String) (f020).</action>
     <!-- UPDATE -->
     <action                   type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 92 to 104 #1498.</action>
     <action                   type="update" dev="ggregory" due-to="Gary Gregory">[test] Bump org.apache.commons:commons-text from 1.14.0 to 1.15.0.</action>
