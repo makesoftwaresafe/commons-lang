@@ -165,6 +165,21 @@ class RangeReadObjectTest {
         assertThrows(InvalidObjectException.class, () -> deserialize(forged));
     }
 
+    /**
+     * Forged stream with a NaN maximum and a canonically matching hashCode: the hashCode gate passes and the
+     * comparator ordering gate passes (NaN sorts above everything under Double.compareTo), so only the NaN
+     * endpoint gate stands between the stream and a half-unbounded fail-open range.
+     */
+    @Test
+    void testNaNEndpointViaForgedStream() throws Exception {
+        final Double min = Double.valueOf(5.0);
+        final Double max = Double.valueOf(Double.NaN);
+        final int canonicalHash = Objects.hash(min, max);
+        final Object comparator = Range.of(Integer.valueOf(1), Integer.valueOf(2)).getComparator();
+        final byte[] forged = forgeRangeStream(comparator, min, max, canonicalHash);
+        assertThrows(InvalidObjectException.class, () -> deserialize(forged));
+    }
+
     @Test
     void testRoundTripPreservesCorrectHashCode() throws Exception {
         final Range<String> range = Range.of("apple", "mango");

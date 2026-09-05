@@ -78,6 +78,7 @@ public class Range<T> implements Serializable {
      * @throws NullPointerException when fromInclusive is null.
      * @throws NullPointerException when toInclusive is null.
      * @throws ClassCastException if the elements are not {@link Comparable}.
+     * @throws IllegalArgumentException if either element is a floating-point NaN.
      * @deprecated Use {@link #of(Comparable, Comparable)}.
      */
     @Deprecated
@@ -102,6 +103,7 @@ public class Range<T> implements Serializable {
      * @throws NullPointerException when fromInclusive is null.
      * @throws NullPointerException when toInclusive is null.
      * @throws ClassCastException if using natural ordering and the elements are not {@link Comparable}.
+     * @throws IllegalArgumentException if either element is a floating-point NaN.
      * @deprecated Use {@link #of(Object, Object, Comparator)}.
      */
     @Deprecated
@@ -125,6 +127,7 @@ public class Range<T> implements Serializable {
      * @return The range object, not null.
      * @throws NullPointerException if the element is null.
      * @throws ClassCastException if the element is not {@link Comparable}.
+     * @throws IllegalArgumentException if the element is a floating-point NaN.
      */
     public static <T extends Comparable<? super T>> Range<T> is(final T element) {
         return of(element, element, null);
@@ -143,9 +146,23 @@ public class Range<T> implements Serializable {
      * @return The range object, not null.
      * @throws NullPointerException if the element is null.
      * @throws ClassCastException if using natural ordering and the elements are not {@link Comparable}.
+     * @throws IllegalArgumentException if the element is a floating-point NaN.
      */
     public static <T> Range<T> is(final T element, final Comparator<T> comparator) {
         return of(element, element, comparator);
+    }
+
+    /**
+     * Tests whether the element is a floating-point NaN. A NaN endpoint sorts above every value under the natural
+     * total order ({@link Double#compareTo(Double)} / {@link Float#compareTo(Float)}), silently producing a
+     * half-unbounded range whose {@code contains}/{@code fit} accept every value above the minimum.
+     *
+     * @param element The element to test, may be null.
+     * @return Whether the element is a floating-point NaN.
+     */
+    private static boolean isNaN(final Object element) {
+        return element instanceof Double && ((Double) element).isNaN()
+                || element instanceof Float && ((Float) element).isNaN();
     }
 
     /**
@@ -163,6 +180,7 @@ public class Range<T> implements Serializable {
      * @return The range object, not null.
      * @throws NullPointerException if either element is null.
      * @throws ClassCastException if the elements are not {@link Comparable}.
+     * @throws IllegalArgumentException if either element is a floating-point NaN.
      * @since 3.13.0
      */
     public static <T extends Comparable<? super T>> Range<T> of(final T fromInclusive, final T toInclusive) {
@@ -186,10 +204,25 @@ public class Range<T> implements Serializable {
      * @throws NullPointerException when fromInclusive is null.
      * @throws NullPointerException when toInclusive is null.
      * @throws ClassCastException if using natural ordering and the elements are not {@link Comparable}.
+     * @throws IllegalArgumentException if either element is a floating-point NaN.
      * @since 3.13.0
      */
     public static <T> Range<T> of(final T fromInclusive, final T toInclusive, final Comparator<T> comparator) {
         return new Range<>(fromInclusive, toInclusive, comparator);
+    }
+
+    /**
+     * Validates that a floating-point endpoint is not NaN, mirroring the fail-closed posture of
+     * {@link Validate#notNaN(double, String, Object...)}.
+     *
+     * @param element The endpoint to validate.
+     * @param name The parameter name for the exception message.
+     * @throws IllegalArgumentException if the endpoint is a floating-point NaN.
+     */
+    private static void requireNotNaN(final Object element, final String name) {
+        if (isNaN(element)) {
+            throw new IllegalArgumentException(name + " must not be NaN");
+        }
     }
 
     /**
@@ -225,11 +258,14 @@ public class Range<T> implements Serializable {
      * @param comp  The comparator to be used, null for natural ordering.
      * @throws NullPointerException when element1 is null.
      * @throws NullPointerException when element2 is null.
+     * @throws IllegalArgumentException when element1 or element2 is a floating-point NaN.
      */
     @SuppressWarnings("unchecked")
     Range(final T element1, final T element2, final Comparator<T> comp) {
         Objects.requireNonNull(element1, "element1");
         Objects.requireNonNull(element2, "element2");
+        requireNotNaN(element1, "element1");
+        requireNotNaN(element2, "element2");
         if (comp == null) {
             this.comparator = ComparableComparator.INSTANCE;
         } else {
@@ -553,6 +589,11 @@ public class Range<T> implements Serializable {
         SerializationUtils.requireNonNull(maximum, "maximum null");
         SerializationUtils.requireNonNull(minimum, "minimum null");
         SerializationUtils.requireNonNull(comparator, "comparator null");
+        // Mirror the constructor's NaN endpoint rejection: a crafted stream cannot smuggle in the degenerate
+        // half-unbounded range that construction refuses.
+        if (isNaN(minimum) || isNaN(maximum)) {
+            throw new InvalidObjectException("Range minimum/maximum must not be NaN.");
+        }
         if (comparator.compare(minimum, maximum) > 0) {
             throw new InvalidObjectException("Range minimum is greater than maximum under the comparator.");
         }
