@@ -276,6 +276,7 @@ java.lang.NullPointerException: Cannot invoke
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">FormattableUtils.append pads right-justified output with insert(0) per char; O(width^2); '%500000s' costs ~1.25e11 char moves (f024).</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">Attacker-controlled exception message forges frames in getRootCauseStackTrace output AND suppresses all real frames, beyond cosmetic log spoofing (f025).</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">StrBuilder.indexOf materializes the whole builder as a String per call; deleteAll/replaceAll multiply it into ~750 GB churn on a 1 MB builder (f026).</action>
+    <action                   type="fix" dev="ggregory" due-to="Gary Gregory">ThresholdCircuitBreaker accepts negative increments and overflows its accumulator, silently keeping the breaker closed (f027).</action>
     <!-- ADD -->
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add JavaVersion.JAVA_27.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add SystemUtils.IS_JAVA_27.</action>
