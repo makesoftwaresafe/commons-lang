@@ -268,6 +268,7 @@ java.lang.NullPointerException: Cannot invoke
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">Match Javadoc to code in SystemProperties.getProperty() and SystemUtils.getEnvironmentVariable() and update inline comments (f016).</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">Fix LockingVisitors Javadoc to match code (f017).</action>
     <action                   type="fix" dev="ggregory" due-to="Gary Gregory">DoubleRange/Range accept NaN endpoints, silently producing a half-unbounded range, contains()/fit() fail open for every value above the minimum (f018).</action>
+    <action                   type="fix" dev="ggregory" due-to="Gary Gregory">BitField long-mask fields silently mis-answer int/short/byte accessors: shifts masked mod 32, and sign extension makes above-bit-31 flags read as set on any negative holder (f019).</action>
     <!-- ADD -->
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add JavaVersion.JAVA_27.</action>
     <action                   type="add" dev="ggregory" due-to="Gary Gregory">Add SystemUtils.IS_JAVA_27.</action>
