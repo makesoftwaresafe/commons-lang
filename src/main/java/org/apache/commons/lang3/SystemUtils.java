@@ -24,8 +24,8 @@ import java.nio.file.Paths;
  * Helpers for {@link System}.
  *
  * <p>
- * If a system property cannot be read due to security restrictions, the corresponding field in this class will be set to {@code null} and a message will be
- * written to {@code System.err}.
+ * If a system property cannot be read due to security restrictions, the corresponding field in this class will be set to {@code null}; the
+ * {@link SecurityException} is swallowed silently, so a denied read is indistinguishable from an absent property.
  * </p>
  * <p>
  * #ThreadSafe#
@@ -2117,7 +2117,8 @@ public class SystemUtils {
      * Gets an environment variable, defaulting to {@code defaultValue} if the variable cannot be read.
      *
      * <p>
-     * If a {@link SecurityException} is caught, the return value is {@code defaultValue} and a message is written to {@code System.err}.
+     * If a {@link SecurityException} is caught, the return value is {@code defaultValue}; the exception is swallowed silently, so a denied read is
+     * indistinguishable from an unset variable.
      * </p>
      *
      * @param name         The environment variable name.
@@ -2130,8 +2131,8 @@ public class SystemUtils {
             final String value = System.getenv(name);
             return value == null ? defaultValue : value;
         } catch (final SecurityException ex) {
-            // we are not allowed to look at this property
-            // System.err.println("Caught a SecurityException reading the environment variable '" + name + "'.");
+            // We are not allowed to look at this environment variable; fall through to the default silently
+            // (the SecurityManager that raises this is terminally deprecated as of Java 17 / JEP 411).
             return defaultValue;
         }
     }
