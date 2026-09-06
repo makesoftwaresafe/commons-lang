@@ -1469,11 +1469,14 @@ public abstract class ToStringStyle implements Serializable {
      * @param object The {@link Object} to build a {@code toString} for.
      */
     public void appendEnd(final StringBuffer buffer, final Object object) {
-        if (!isFieldSeparatorAtEnd()) {
-            removeLastFieldSeparator(buffer);
+        try {
+            if (!isFieldSeparatorAtEnd()) {
+                removeLastFieldSeparator(buffer);
+            }
+            appendContentEnd(buffer);
+        } finally {
+            unregister(object);
         }
-        appendContentEnd(buffer);
-        unregister(object);
     }
 
     /**
