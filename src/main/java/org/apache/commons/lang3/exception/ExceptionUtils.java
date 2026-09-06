@@ -23,8 +23,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -521,7 +523,7 @@ public class ExceptionUtils {
      * <p>This method handles recursive cause chains that might
      * otherwise cause infinite loops. The cause chain is processed until
      * the end, or until the next item in the chain is already
-     * in the result list.</p>
+     * in the result list, compared by identity.</p>
      *
      * @param throwable  The throwable to inspect, may be null.
      * @return The list of throwables, never null.
@@ -529,7 +531,8 @@ public class ExceptionUtils {
      */
     public static List<Throwable> getThrowableList(Throwable throwable) {
         final List<Throwable> list = new ArrayList<>();
-        while (throwable != null && !list.contains(throwable)) {
+        final Set<Throwable> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        while (throwable != null && seen.add(throwable)) {
             list.add(throwable);
             throwable = throwable.getCause();
         }

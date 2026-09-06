@@ -51,6 +51,46 @@ import org.junit.jupiter.api.Test;
  */
 class ExceptionUtilsTest extends AbstractLangTest {
 
+    private static final class CountingException extends Exception {
+        private static final long serialVersionUID = 1L;
+
+        private int causeCalls;
+
+        CountingException(final Throwable cause) {
+            super(null, cause, false, false);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            throw new AssertionError("Chain walking must not invoke equals");
+        }
+
+        @Override
+        public synchronized Throwable getCause() {
+            causeCalls++;
+            return super.getCause();
+        }
+
+        @Override
+        public int hashCode() {
+            throw new AssertionError("Chain walking must not invoke hashCode");
+        }
+    }
+
+    private static final class EqualException extends Exception {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public boolean equals(final Object obj) {
+            return obj instanceof EqualException;
+        }
+
+        @Override
+        public int hashCode() {
+            return 1;
+        }
+    }
+
     /**
      * Provides a method with a well known chained/nested exception
      * name which matches the full signature (e.g. has a return value
@@ -523,6 +563,59 @@ class ExceptionUtilsTest extends AbstractLangTest {
         assertEquals(3, ExceptionUtils.getThrowableCount(withCause));
         assertEquals(1, ExceptionUtils.getThrowableCount(jdkNoCause));
         assertEquals(3, ExceptionUtils.getThrowableCount(cyclicCause));
+    }
+
+    @Test
+    void testGetThrowableListDeepChain() {
+        final CountingException[] chain = new CountingException[10_000];
+        for (int i = chain.length - 1; i >= 0; i--) {
+            chain[i] = new CountingException(i + 1 < chain.length ? chain[i + 1] : null);
+        }
+        final List<Throwable> throwables = ExceptionUtils.getThrowableList(chain[0]);
+        assertEquals(chain.length, throwables.size());
+        for (int i = 0; i < chain.length; i++) {
+            assertSame(chain[i], throwables.get(i));
+            assertEquals(1, chain[i].causeCalls);
+        }
+        assertEquals(chain.length, ExceptionUtils.getThrowableCount(chain[0]));
+        assertSame(chain[chain.length - 1], ExceptionUtils.getRootCause(chain[0]));
+        final Throwable[] array = ExceptionUtils.getThrowables(chain[0]);
+        final Throwable[] stream = ExceptionUtils.stream(chain[0]).toArray(Throwable[]::new);
+        assertEquals(chain.length, array.length);
+        assertEquals(chain.length, stream.length);
+        for (int i = 0; i < chain.length; i++) {
+            assertSame(chain[i], array[i]);
+            assertSame(chain[i], stream[i]);
+        }
+    }
+
+    @Test
+    void testGetThrowableListEqualExceptions() {
+        final EqualException first = new EqualException();
+        final EqualException second = new EqualException();
+        final EqualException third = new EqualException();
+        first.initCause(second);
+        second.initCause(third);
+        final List<Throwable> throwables = ExceptionUtils.getThrowableList(first);
+        assertEquals(3, throwables.size());
+        assertSame(first, throwables.get(0));
+        assertSame(second, throwables.get(1));
+        assertSame(third, throwables.get(2));
+        third.initCause(second);
+        final List<Throwable> cyclic = ExceptionUtils.getThrowableList(first);
+        assertEquals(3, cyclic.size());
+        assertSame(first, cyclic.get(0));
+        assertSame(second, cyclic.get(1));
+        assertSame(third, cyclic.get(2));
+    }
+
+    @Test
+    void testGetThrowableListSelfCause() {
+        final ExceptionWithCause exception = new ExceptionWithCause(null);
+        exception.setCause(exception);
+        final List<Throwable> throwables = ExceptionUtils.getThrowableList(exception);
+        assertEquals(1, throwables.size());
+        assertSame(exception, throwables.get(0));
     }
 
     @Test
