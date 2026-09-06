@@ -590,6 +590,18 @@ public abstract class ToStringStyle implements Serializable {
      */
 
     /**
+     * A per-thread set of objects already rendered in detail during the current top-level
+     * {@code reflectionToString} call. Unlike {@link #REGISTRY}, which is a depth-first visit
+     * <em>stack</em> (entries are removed when a visit completes) and therefore only detects
+     * cycles, this set is only cleared when the top-level call completes. Styles that recurse
+     * into arbitrary object graphs (see {@link RecursiveToStringStyle}) consult it so that shared
+     * (acyclic) references are detailed at most once per top-level call, keeping traversal cost
+     * linear in the size of the object graph instead of exponential on reference diamonds.
+     * Identity-based for the same reason as {@link #REGISTRY}. Empty unless such a style is in use.
+     */
+    private static final ThreadLocal<IdentityHashMap<Object, Object>> VISITED = ThreadLocal.withInitial(IdentityHashMap::new);
+
+    /**
      * Gets the registry of objects being traversed by the {@code reflectionToString} methods in the current thread.
      *
      * @return Set the registry of objects being traversed.
@@ -606,6 +618,31 @@ public abstract class ToStringStyle implements Serializable {
      */
     static boolean isRegistered(final Object value) {
         return getRegistry().containsKey(value);
+    }
+
+    /**
+     * Tests whether the given object has already been rendered in detail during the current
+     * top-level {@code reflectionToString} call. Used by graph-recursing styles to avoid
+     * exponential re-traversal of shared (acyclic) references.
+     *
+     * @param value The object to look up in the visited set.
+     * @return {@code true} if the object was already visited in this top-level call.
+     */
+    static boolean isVisited(final Object value) {
+        return VISITED.get().containsKey(value);
+    }
+
+    /**
+     * Marks the given object as rendered in detail for the current top-level
+     * {@code reflectionToString} call. The mark is cleared when the top-level call completes
+     * (when the visit stack in {@link #REGISTRY} empties).
+     *
+     * @param value The object to mark as visited.
+     */
+    static void markVisited(final Object value) {
+        if (value != null) {
+            VISITED.get().put(value, null);
+        }
     }
 
     /**
@@ -634,6 +671,8 @@ public abstract class ToStringStyle implements Serializable {
             m.remove(value);
             if (m.isEmpty()) {
                 REGISTRY.remove();
+                // The top-level reflectionToString call is complete: clear the visited set as well.
+                VISITED.remove();
             }
         }
     }

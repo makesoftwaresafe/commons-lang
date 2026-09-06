@@ -216,6 +216,14 @@ public class EqualsBuilder extends AbstractReflection implements Builder<Boolean
      * {@link EqualsBuilder} recursively instead of invoking their
      * {@code equals()} method. Leading to a deep reflection equals test.
      *
+     * <p>Note on graph shape: the internal registry that prevents infinite recursion on
+     * cyclic object graphs is a visit stack, not a visited set - object pairs reachable
+     * more than once through shared (acyclic) references are re-compared on every path.
+     * On deeply nested graphs with many shared references (reference "diamonds"), the
+     * comparison cost can grow exponentially with nesting depth. Do not use recursive
+     * reflection equality on object graphs built from untrusted input (for example,
+     * graphs materialized by an identity-preserving deserializer).</p>
+     *
      * @param lhs  {@code this} object
      * @param rhs  The other object
      * @param testTransients  whether to include transient fields
@@ -1030,6 +1038,10 @@ public class EqualsBuilder extends AbstractReflection implements Builder<Boolean
      * Sets whether to test fields recursively, instead of using their equals method, when reflectively comparing objects.
      * String objects, which cache a hash value, are automatically excluded from recursive testing.
      * You may specify other exceptions by calling {@link #setBypassReflectionClasses(List)}.
+     *
+     * <p>Cycle protection is a visit stack, not a visited set: shared (acyclic) references are
+     * re-compared on every path, so deeply nested graphs with many shared references can be
+     * exponentially expensive to compare. Avoid on object graphs built from untrusted input.</p>
      *
      * @param testRecursive whether to do a recursive test
      * @return {@code this} instance.
