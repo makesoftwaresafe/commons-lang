@@ -406,7 +406,7 @@ public enum JavaVersion {
      * }</pre>
      *
      * @param requiredVersion The version to check against, not null.
-     * @return true if this version is equal to or greater than the specified version.
+     * @return true if this version is equal to or less than the specified version.
      * @since 3.9
      */
     public boolean atMost(final JavaVersion requiredVersion) {
