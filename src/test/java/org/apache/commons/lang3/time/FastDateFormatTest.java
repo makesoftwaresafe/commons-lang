@@ -219,6 +219,36 @@ class FastDateFormatTest extends AbstractLangTest {
         assertEquals(Locale.GERMANY, format3.getLocale());
     }
 
+    /**
+     * The instance cache is bounded: once it reaches its size limit, it is flushed rather than
+     * growing without bound per distinct pattern.
+     */
+    @Test
+    void test_instanceCacheIsBounded() {
+        FastDateFormat.clear();
+        final FastDateFormat first = FastDateFormat.getInstance("yyyy-MM-dd");
+        assertSame(first, FastDateFormat.getInstance("yyyy-MM-dd"));
+        // Exceed the cache bound with distinct patterns; the cache must flush, not grow forever.
+        for (int i = 0; i <= AbstractFormatCache.MAX_CACHE_SIZE; i++) {
+            FastDateFormat.getInstance("'p" + i + "'yyyy");
+        }
+        assertNotSame(first, FastDateFormat.getInstance("yyyy-MM-dd"), "Cache was not flushed at its bound");
+        FastDateFormat.clear();
+    }
+
+    /**
+     * Tests the public cache-flush entry point.
+     */
+    @Test
+    void test_publicClearCache() {
+        final FastDateFormat format1 = FastDateFormat.getInstance("yyyy-MM-dd'T'HH");
+        assertSame(format1, FastDateFormat.getInstance("yyyy-MM-dd'T'HH"));
+        FastDateFormat.clear();
+        final FastDateFormat format2 = FastDateFormat.getInstance("yyyy-MM-dd'T'HH");
+        assertNotSame(format1, format2);
+        assertEquals(format1, format2);
+    }
+
     @Test
     @ReadsDefaultLocale
     @ReadsDefaultTimeZone

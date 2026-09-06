@@ -1021,6 +1021,11 @@ public class FastDatePrinter implements DatePrinter, Serializable {
      */
     static String getTimeZoneDisplay(final TimeZone tz, final boolean daylight, final int style, final Locale locale) {
         final TimeZoneDisplayKey key = new TimeZoneDisplayKey(tz, daylight, style, locale);
+        // Bound the cache: it is static and process-lifetime, and custom time zone IDs give the
+        // key unbounded cardinality, which would otherwise pin memory forever.
+        if (timeZoneDisplayCache.size() >= AbstractFormatCache.MAX_CACHE_SIZE && !timeZoneDisplayCache.containsKey(key)) {
+            timeZoneDisplayCache.clear();
+        }
         // This is a very slow call, so cache the results.
         return timeZoneDisplayCache.computeIfAbsent(key, k -> tz.getDisplayName(daylight, style, locale));
     }

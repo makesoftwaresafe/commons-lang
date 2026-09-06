@@ -50,6 +50,13 @@ import java.util.TimeZone;
  * </p>
  *
  * <p>
+ * Note on memory retention: unlike {@code new SimpleDateFormat(pattern)}, instances obtained from the static factory methods are held in a static cache keyed
+ * by (pattern, time zone, locale). The cache is bounded (it is flushed when it exceeds an internal limit) and can be flushed explicitly with
+ * {@link #clear()}, but each distinct key retains its instance for the lifetime of the JVM until then. Prefer fixed, application-defined patterns; do not
+ * pass unvalidated caller-supplied pattern, time zone, or locale values to the factory methods.
+ * </p>
+ *
+ * <p>
  * All patterns are compatible with SimpleDateFormat (except time zones and some year patterns - see below).
  * </p>
  *
@@ -113,12 +120,30 @@ public class FastDateFormat extends Format implements DateParser, DatePrinter {
     };
 
     /**
-     * Clears the cache.
+     * Clears the caches.
+     * <p>
+     * Clears the static caches used by {@link FastDateFormat}: the (pattern, time zone, locale) to instance cache and the time zone display-name cache.
+     * Cached instances already obtained by callers remain valid; subsequent factory calls simply create and cache new instances. This can be used for
+     * operational relief if many distinct patterns, time zones, or locales have been used.
+     * </p>
      */
     static void clear() {
         AbstractFormatCache.clear();
         CACHE.clearInstance();
+        FastDatePrinter.clear();
     }
+
+//    /**
+//     * Clears the static caches used by {@link FastDateFormat}: the (pattern, time zone, locale) to instance cache and the time zone display-name cache.
+//     * Cached instances already obtained by callers remain valid; subsequent factory calls simply create and cache new instances. This can be used for
+//     * operational relief if many distinct patterns, time zones, or locales have been used.
+//     *
+//     * @since 3.21.0
+//     */
+//    public static void clearCache() {
+//        clear();
+//        FastDatePrinter.clear();
+//    }
 
     /**
      * Gets a date formatter instance using the specified style in the default time zone and locale.

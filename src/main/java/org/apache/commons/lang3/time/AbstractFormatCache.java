@@ -79,6 +79,15 @@ abstract class AbstractFormatCache<F extends Format> {
      */
     static final int NONE = -1;
 
+    /**
+     * Maximum number of entries a static cache in this package may hold before it is flushed.
+     * These caches live for the lifetime of the JVM and are keyed by caller-supplied values
+     * (pattern, time zone, locale), so without a bound, unbounded-cardinality inputs would pin
+     * memory forever. The bound is approximate under concurrency; flushing only costs
+     * re-creation of evicted entries.
+     */
+    static final int MAX_CACHE_SIZE = 1024;
+
     private static final ConcurrentMap<ArrayKey, String> dateTimeInstanceCache = new ConcurrentHashMap<>(7);
 
     /**
@@ -213,6 +222,11 @@ abstract class AbstractFormatCache<F extends Format> {
         final TimeZone actualTimeZone = TimeZones.toTimeZone(timeZone);
         final Locale actualLocale = LocaleUtils.toLocale(locale);
         final ArrayKey key = new ArrayKey(pattern, actualTimeZone, actualLocale);
+        // Bound the cache: it is static and process-lifetime, so unbounded-cardinality keys
+        // (for example patterns derived from caller input) would otherwise pin memory forever.
+        if (instanceCache.size() >= MAX_CACHE_SIZE && !instanceCache.containsKey(key)) {
+            instanceCache.clear();
+        }
         return instanceCache.computeIfAbsent(key, k -> createInstance(pattern, actualTimeZone, actualLocale));
     }
 
